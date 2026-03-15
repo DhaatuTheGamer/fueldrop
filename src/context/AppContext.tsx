@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback, useMemo } from 'react';
 import { User, Vehicle, Order, Location, FavoriteOrder, AppNotification, CartItem, SavedAddress } from '../types';
 import { usePersistedState, clearPersistedState } from '../hooks/usePersistedState';
 
@@ -54,20 +54,40 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [darkMode]);
 
-  const addNotification = (title: string, message: string, type: 'info' | 'success' | 'warning' = 'info') => {
-    setNotifications(prev => [{
-      id: Date.now().toString(),
-      title,
-      message,
-      type,
-      timestamp: new Date().toISOString(),
-      read: false
-    }, ...prev]);
-  };
+  const addNotification = useCallback((title: string, message: string, type: 'info' | 'success' | 'warning' = 'info') => {
+    setNotifications(prev => {
+      // Avoid duplicate notifications in quick succession
+      if (prev.length > 0 && prev[0].title === title && prev[0].message === message) {
+        return prev;
+      }
+      return [{
+        id: Date.now().toString() + Math.random().toString(36).substring(2, 9),
+        title,
+        message,
+        type,
+        timestamp: new Date().toISOString(),
+        read: false
+      }, ...prev];
+    });
+  }, []);
 
-  const markNotificationRead = (id: string) => {
+  const markNotificationRead = useCallback((id: string) => {
     setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
-  };
+  }, []);
+
+  // Auto-dismiss unread notifications after 5 seconds
+  useEffect(() => {
+    const unread = notifications.filter(n => !n.read);
+    if (unread.length === 0) return;
+
+    const timers = unread.map(n => {
+      return setTimeout(() => {
+        markNotificationRead(n.id);
+      }, 5000);
+    });
+
+    return () => timers.forEach(clearTimeout);
+  }, [notifications, markNotificationRead]);
 
   const logout = () => {
     clearPersistedState(PERSISTED_KEYS);
@@ -83,35 +103,41 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     setSavedAddresses([]);
   };
 
+  const contextValue = useMemo(() => ({
+    user,
+    setUser,
+    vehicles,
+    setVehicles,
+    orders,
+    setOrders,
+    currentOrder,
+    setCurrentOrder,
+    location,
+    setLocation,
+    favoriteOrders,
+    setFavoriteOrders,
+    notifications,
+    addNotification,
+    markNotificationRead,
+    darkMode,
+    setDarkMode,
+    hasCompletedOnboarding,
+    setHasCompletedOnboarding,
+    cart,
+    setCart,
+    savedAddresses,
+    setSavedAddresses,
+    logout,
+  }), [
+    user, setUser, vehicles, setVehicles, orders, setOrders,
+    currentOrder, location, favoriteOrders, setFavoriteOrders,
+    notifications, addNotification, markNotificationRead,
+    darkMode, setDarkMode, hasCompletedOnboarding, setHasCompletedOnboarding,
+    cart, savedAddresses, setSavedAddresses, logout
+  ]);
+
   return (
-    <AppContext.Provider
-      value={{
-        user,
-        setUser,
-        vehicles,
-        setVehicles,
-        orders,
-        setOrders,
-        currentOrder,
-        setCurrentOrder,
-        location,
-        setLocation,
-        favoriteOrders,
-        setFavoriteOrders,
-        notifications,
-        addNotification,
-        markNotificationRead,
-        darkMode,
-        setDarkMode,
-        hasCompletedOnboarding,
-        setHasCompletedOnboarding,
-        cart,
-        setCart,
-        savedAddresses,
-        setSavedAddresses,
-        logout,
-      }}
-    >
+    <AppContext.Provider value={contextValue}>
       {children}
     </AppContext.Provider>
   );
