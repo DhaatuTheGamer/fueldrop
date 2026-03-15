@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Fuel, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 
 export default function Login() {
@@ -9,7 +10,8 @@ export default function Login() {
   const [step, setStep] = useState<'phone' | 'otp'>('phone');
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [countdown, setCountdown] = useState(30);
-  const { setUser, setCurrentView, addNotification } = useAppContext();
+  const { setUser, addNotification, vehicles, hasCompletedOnboarding } = useAppContext();
+  const navigate = useNavigate();
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -41,7 +43,12 @@ export default function Login() {
         name: 'Guest User',
         email: '',
       });
-      setCurrentView('home');
+      // Route new users to onboarding, returning users to home
+      if (!hasCompletedOnboarding && vehicles.length === 0) {
+        navigate('/onboarding');
+      } else {
+        navigate('/');
+      }
       setTimeout(() => {
         addNotification('Welcome to FuelDrop!', 'Get ₹50 off on your first order with code FIRST50', 'success');
       }, 1000);
@@ -96,7 +103,7 @@ export default function Login() {
                 className="mt-1 w-4 h-4 text-primary rounded-sm focus:ring-primary border-2 border-border bg-bg"
               />
               <span className="text-sm text-muted leading-tight font-body">
-                I agree to the <button type="button" onClick={() => setCurrentView('terms')} className="text-primary hover:underline font-bold">Terms & Conditions</button> and <button type="button" onClick={() => setCurrentView('privacy')} className="text-primary hover:underline font-bold">Privacy Policy</button>
+                I agree to the <button type="button" onClick={() => navigate('/terms')} className="text-primary hover:underline font-bold">Terms & Conditions</button> and <button type="button" onClick={() => navigate('/privacy')} className="text-primary hover:underline font-bold">Privacy Policy</button>
               </span>
             </label>
 

@@ -1,64 +1,82 @@
 import React from 'react';
-import { ArrowLeft, Moon, Sun, FileText, Shield, Info } from 'lucide-react';
+import { ArrowLeft, Moon, Sun, Info, FileText, Shield, ChevronRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 
 export default function Settings() {
-  const { setCurrentView, darkMode, setDarkMode } = useAppContext();
+  const { darkMode, setDarkMode } = useAppContext();
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-bg flex flex-col transition-colors">
       <header className="bg-surface border-b-2 border-border px-6 py-4 flex items-center sticky top-0 z-10 transition-colors">
-        <button onClick={() => setCurrentView('home')} className="mr-4 text-text hover:text-primary transition-colors">
+        <button onClick={() => navigate('/')} className="mr-4 text-text hover:text-primary transition-colors">
           <ArrowLeft size={24} />
         </button>
         <h1 className="font-heading font-bold text-xl text-text uppercase tracking-wider">Settings</h1>
       </header>
 
-      <main className="flex-1 p-6 max-w-md mx-auto w-full space-y-6">
-        <div className="card-brutal p-4 transition-colors">
-          <div className="flex items-center justify-between p-2">
-            <div className="flex items-center space-x-3 text-text">
-              {darkMode ? <Moon size={20} /> : <Sun size={20} />}
-              <span className="font-heading font-bold uppercase tracking-wider">Dark Mode</span>
+      <main className="flex-1 p-6 max-w-md mx-auto w-full">
+        <div className="card-brutal overflow-hidden transition-colors">
+          {/* Dark Mode Toggle */}
+          <div className="p-4 flex items-center justify-between border-b-2 border-border transition-colors">
+            <div className="flex items-center">
+              <div className="w-10 h-10 bg-bg border-2 border-border rounded-sm flex items-center justify-center text-text mr-3 transition-colors shadow-brutal-sm">
+                {darkMode ? <Moon size={20} /> : <Sun size={20} />}
+              </div>
+              <div>
+                <span className="font-heading font-bold text-text uppercase tracking-wider text-sm">Dark Mode</span>
+                <p className="text-xs text-muted font-body">{darkMode ? 'Lights off' : 'Lights on'}</p>
+              </div>
             </div>
-            <button 
-              onClick={() => setDarkMode(!darkMode)} 
-              className={`w-14 h-8 rounded-sm border-2 border-border p-1 transition-colors ${darkMode ? 'bg-primary' : 'bg-surface'}`}
+            <button
+              onClick={() => setDarkMode(!darkMode)}
+              className={`relative w-14 h-8 rounded-sm border-2 border-border transition-colors ${darkMode ? 'bg-primary' : 'bg-surface'}`}
             >
-              <div className={`w-5 h-5 rounded-sm bg-text transition-transform ${darkMode ? 'translate-x-6' : 'translate-x-0'}`} />
+              <div className={`absolute top-1 w-5 h-5 rounded-sm bg-bg border-2 border-border transition-all shadow-brutal-sm ${darkMode ? 'right-1' : 'left-1'}`} />
             </button>
           </div>
-        </div>
 
-        <div className="card-brutal p-2 transition-colors">
-          <button 
-            onClick={() => setCurrentView('about')} 
-            className="w-full flex items-center justify-between p-4 text-text hover:bg-bg rounded-sm transition-colors"
+          {/* About */}
+          <button
+            onClick={() => navigate('/about')}
+            className="w-full p-4 flex items-center justify-between border-b-2 border-border hover:bg-bg transition-colors"
           >
-            <div className="flex items-center space-x-3">
-              <Info size={20} className="text-primary" />
-              <span className="font-heading font-bold uppercase tracking-wider">About FuelDrop</span>
+            <div className="flex items-center">
+              <div className="w-10 h-10 bg-bg border-2 border-border rounded-sm flex items-center justify-center text-text mr-3 transition-colors shadow-brutal-sm">
+                <Info size={20} />
+              </div>
+              <span className="font-heading font-bold text-text uppercase tracking-wider text-sm">About FuelDrop</span>
             </div>
+            <ChevronRight size={20} className="text-muted" />
           </button>
-          <div className="h-0.5 bg-border mx-4" />
-          <button 
-            onClick={() => setCurrentView('terms')} 
-            className="w-full flex items-center justify-between p-4 text-text hover:bg-bg rounded-sm transition-colors"
+
+          {/* Terms */}
+          <button
+            onClick={() => navigate('/terms')}
+            className="w-full p-4 flex items-center justify-between border-b-2 border-border hover:bg-bg transition-colors"
           >
-            <div className="flex items-center space-x-3">
-              <FileText size={20} className="text-primary" />
-              <span className="font-heading font-bold uppercase tracking-wider">Terms & Conditions</span>
+            <div className="flex items-center">
+              <div className="w-10 h-10 bg-bg border-2 border-border rounded-sm flex items-center justify-center text-text mr-3 transition-colors shadow-brutal-sm">
+                <FileText size={20} />
+              </div>
+              <span className="font-heading font-bold text-text uppercase tracking-wider text-sm">Terms & Conditions</span>
             </div>
+            <ChevronRight size={20} className="text-muted" />
           </button>
-          <div className="h-0.5 bg-border mx-4" />
-          <button 
-            onClick={() => setCurrentView('privacy')} 
-            className="w-full flex items-center justify-between p-4 text-text hover:bg-bg rounded-sm transition-colors"
+
+          {/* Privacy */}
+          <button
+            onClick={() => navigate('/privacy')}
+            className="w-full p-4 flex items-center justify-between hover:bg-bg transition-colors"
           >
-            <div className="flex items-center space-x-3">
-              <Shield size={20} className="text-primary" />
-              <span className="font-heading font-bold uppercase tracking-wider">Privacy Policy</span>
+            <div className="flex items-center">
+              <div className="w-10 h-10 bg-bg border-2 border-border rounded-sm flex items-center justify-center text-text mr-3 transition-colors shadow-brutal-sm">
+                <Shield size={20} />
+              </div>
+              <span className="font-heading font-bold text-text uppercase tracking-wider text-sm">Privacy Policy</span>
             </div>
+            <ChevronRight size={20} className="text-muted" />
           </button>
         </div>
       </main>

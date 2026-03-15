@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { Star, CheckCircle2 } from 'lucide-react';
-import { useAppContext } from '../context/AppContext';
+import { useNavigate } from 'react-router-dom';
 
 export default function Rating() {
-  const { setCurrentView } = useAppContext();
+  const navigate = useNavigate();
   const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
   const [tip, setTip] = useState(0);
@@ -15,9 +15,7 @@ export default function Rating() {
 
   const handleSubmit = () => {
     setSubmitted(true);
-    setTimeout(() => {
-      setCurrentView('home');
-    }, 2000);
+    setTimeout(() => navigate('/'), 2000);
   };
 
   if (submitted) {
@@ -108,7 +106,7 @@ export default function Rating() {
           </button>
           
           <button
-            onClick={() => setCurrentView('home')}
+            onClick={() => navigate('/')}
             className="w-full py-4 text-muted font-heading font-bold uppercase tracking-wider hover:text-text transition-colors"
           >
             Skip for now

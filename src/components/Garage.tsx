@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowLeft, Car, Plus, Trash2, Edit2, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import { Vehicle, VehicleType, FuelType } from '../types';
+import LicensePlateInput from './LicensePlateInput';
 
 export default function Garage() {
-  const { vehicles, setVehicles, setCurrentView, addNotification } = useAppContext();
+  const { vehicles, setVehicles, addNotification } = useAppContext();
+  const navigate = useNavigate();
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [vehicleToDelete, setVehicleToDelete] = useState<string | null>(null);
@@ -19,10 +22,10 @@ export default function Garage() {
 
   const handleAddOrEditVehicle = (e: React.FormEvent) => {
     e.preventDefault();
-    const licensePlateRegex = /^[A-Z]{2}\s?[0-9]{1,2}\s?[A-Z]{1,2}\s?[0-9]{4}$/i;
-    
-    if (!licensePlateRegex.test(newVehicle.licensePlate || '')) {
-      addNotification('Invalid License Plate', 'Please enter a valid format (e.g., KA 01 AB 1234).', 'warning');
+    // The LicensePlateInput handles formatting; just check minimum length
+    const plateClean = (newVehicle.licensePlate || '').replace(/\s/g, '');
+    if (plateClean.length < 9) {
+      addNotification('Invalid License Plate', 'Please enter a complete license plate (e.g., KA 01 AB 1234).', 'warning');
       return;
     }
 
@@ -70,7 +73,7 @@ export default function Garage() {
     <div className="min-h-screen bg-bg flex flex-col transition-colors">
       <header className="bg-surface border-b-2 border-border px-6 py-4 flex items-center justify-between sticky top-0 z-10 transition-colors">
         <div className="flex items-center">
-          <button onClick={() => setCurrentView('home')} className="mr-4 text-text hover:text-primary transition-colors">
+          <button onClick={() => navigate('/')} className="mr-4 text-text hover:text-primary transition-colors">
             <ArrowLeft size={24} />
           </button>
           <h1 className="font-heading font-bold text-xl text-text uppercase tracking-wider">My Garage</h1>
@@ -154,13 +157,9 @@ export default function Garage() {
 
                 <div>
                   <label className="label-small">License Plate</label>
-                  <input
-                    type="text"
-                    value={newVehicle.licensePlate}
-                    onChange={(e) => setNewVehicle({ ...newVehicle, licensePlate: e.target.value.toUpperCase() })}
-                    className="input-brutal uppercase"
-                    placeholder="KA 01 AB 1234"
-                    required
+                  <LicensePlateInput
+                    value={newVehicle.licensePlate || ''}
+                    onChange={(val) => setNewVehicle({ ...newVehicle, licensePlate: val })}
                   />
                 </div>
 

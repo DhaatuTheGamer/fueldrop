@@ -1,44 +1,31 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { ArrowLeft, MapPin, Navigation, Car, Fuel as FuelIcon, ArrowRight } from 'lucide-react';
+import { ArrowLeft, Car, Fuel as FuelIcon, ArrowRight, Clock, Zap } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import { FuelType } from '../types';
+import MapPicker from './MapPicker';
+import SchedulePicker from './SchedulePicker';
+import { useDynamicPricing } from '../hooks/useDynamicPricing';
 
 export default function OrderFuel() {
-  const { vehicles, setCurrentView, setCurrentOrder, location, setLocation, addNotification } = useAppContext();
+  const { vehicles, setCurrentOrder, location, setLocation, addNotification } = useAppContext();
+  const navigate = useNavigate();
   const [selectedVehicle, setSelectedVehicle] = useState<string>('');
   const [fuelType, setFuelType] = useState<FuelType>('Petrol');
   const [orderType, setOrderType] = useState<'amount' | 'quantity'>('amount');
   const [value, setValue] = useState<string>('');
-  const [manualAddress, setManualAddress] = useState('');
-  const [isManualAddress, setIsManualAddress] = useState(false);
+  const [isScheduled, setIsScheduled] = useState(false);
+  const [scheduledDate, setScheduledDate] = useState('');
 
   const FUEL_PRICE = {
     Petrol: 101.5,
     Diesel: 89.2,
   };
 
-  const handleDetectLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setLocation({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-            address: 'Detected Location: 12th Main Rd, Indiranagar, Bangalore',
-          });
-          setIsManualAddress(false);
-        },
-        () => {
-          addNotification('Location Error', 'Unable to retrieve your location. Please enter it manually.', 'warning');
-          setIsManualAddress(true);
-        }
-      );
-    } else {
-      addNotification('Location Error', 'Geolocation is not supported by your browser.', 'warning');
-      setIsManualAddress(true);
-    }
-  };
+  const numValue = Number(value) || 0;
+  const quantityLiters = orderType === 'quantity' ? numValue : numValue / FUEL_PRICE[fuelType];
+  const pricing = useDynamicPricing(location, quantityLiters, fuelType);
 
   const handleContinue = () => {
     if (!selectedVehicle) {
@@ -49,109 +36,56 @@ export default function OrderFuel() {
       addNotification('Missing Information', 'Please enter a valid amount or quantity', 'warning');
       return;
     }
-    
-    const finalLocation = isManualAddress && manualAddress 
-      ? { lat: 0, lng: 0, address: manualAddress } 
-      : location;
-
-    if (!finalLocation) {
+    if (!location) {
       addNotification('Missing Information', 'Please provide a delivery location', 'warning');
       return;
     }
+    if (isScheduled && !scheduledDate) {
+      addNotification('Missing Information', 'Please select a delivery time slot', 'warning');
+      return;
+    }
 
-    const numValue = Number(value);
     const amountRupees = orderType === 'amount' ? numValue : numValue * FUEL_PRICE[fuelType];
-    const quantityLiters = orderType === 'quantity' ? numValue : numValue / FUEL_PRICE[fuelType];
 
     setCurrentOrder({
       vehicleId: selectedVehicle,
       fuelType,
       amountRupees,
       quantityLiters,
-      location: finalLocation,
+      location,
+      isScheduled,
+      scheduledDate: isScheduled ? scheduledDate : undefined,
     });
-    setCurrentView('checkout');
+    navigate('/checkout');
   };
 
   return (
     <div className="min-h-screen bg-bg flex flex-col transition-colors">
       <header className="bg-surface border-b-2 border-border px-6 py-4 flex items-center sticky top-0 z-10 transition-colors">
-        <button onClick={() => setCurrentView('home')} className="mr-4 text-text hover:text-primary transition-colors">
+        <button onClick={() => navigate('/')} className="mr-4 text-text hover:text-primary transition-colors">
           <ArrowLeft size={24} />
         </button>
         <h1 className="font-heading font-bold text-xl text-text uppercase tracking-wider">Order Fuel</h1>
       </header>
 
       <main className="flex-1 p-6 max-w-md mx-auto w-full space-y-6">
-        {/* Location Section */}
+        {/* Location Section with Interactive Map */}
         <section className="card-brutal p-6 transition-colors">
           <h2 className="label-small mb-4">Delivery Location</h2>
-          
-          <div className="mb-4 h-32 bg-bg border-2 border-border rounded-sm overflow-hidden relative transition-colors">
-            <div className="absolute inset-0 opacity-20" style={{
-              backgroundImage: 'radial-gradient(circle at center, #E56B25 2px, transparent 2px)',
-              backgroundSize: '16px 16px'
-            }} />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <MapPin size={32} className="text-primary drop-shadow-md" />
-            </div>
-          </div>
-
-          {isManualAddress ? (
-            <div className="mb-4">
-              <textarea
-                value={manualAddress}
-                onChange={(e) => setManualAddress(e.target.value)}
-                placeholder="Enter complete delivery address..."
-                className="input-brutal resize-none h-24 mb-2"
-              />
-              <button 
-                onClick={handleDetectLocation}
-                className="text-sm text-primary font-heading font-bold flex items-center uppercase tracking-wider"
-              >
-                <Navigation size={14} className="mr-1" /> Use GPS instead
-              </button>
-            </div>
-          ) : (
-            <div className="flex items-start space-x-3 mb-4 bg-bg border-2 border-border p-3 rounded-sm transition-colors">
-              <MapPin className="text-primary shrink-0 mt-0.5" size={20} />
-              <div className="flex-1">
-                <p className="text-sm text-text font-body line-clamp-2">
-                  {location ? location.address : 'Location not set'}
-                </p>
-              </div>
-            </div>
-          )}
-
-          {!isManualAddress && (
-            <div className="flex space-x-3">
-              <button
-                onClick={handleDetectLocation}
-                className="flex-1 py-2.5 px-4 bg-primary text-bg border-2 border-border rounded-sm font-heading font-bold text-sm flex items-center justify-center uppercase tracking-wider hover:bg-opacity-90 transition-colors shadow-brutal-sm"
-              >
-                <Navigation size={16} className="mr-2" /> Detect
-              </button>
-              <button
-                onClick={() => setIsManualAddress(true)}
-                className="flex-1 py-2.5 px-4 bg-surface text-text border-2 border-border rounded-sm font-heading font-bold text-sm uppercase tracking-wider hover:bg-bg transition-colors"
-              >
-                Enter Manually
-              </button>
-            </div>
-          )}
+          <MapPicker location={location} onLocationSelect={setLocation} />
         </section>
 
         {/* Vehicle Selection */}
         <section className="card-brutal p-6 transition-colors">
           <div className="flex items-center justify-between mb-4">
             <h2 className="label-small">Select Vehicle</h2>
-            <button onClick={() => setCurrentView('garage')} className="text-primary text-xs font-heading font-bold uppercase tracking-wider hover:underline">Add New</button>
+            <button onClick={() => navigate('/garage')} className="text-primary text-xs font-heading font-bold uppercase tracking-wider hover:underline">Add New</button>
           </div>
           
           {vehicles.length === 0 ? (
             <div className="text-center py-4 bg-bg rounded-sm border-2 border-border transition-colors">
               <p className="text-muted font-body text-sm mb-2">No vehicles found</p>
-              <button onClick={() => setCurrentView('garage')} className="text-primary font-heading font-bold text-sm uppercase tracking-wider hover:underline">Go to Garage</button>
+              <button onClick={() => navigate('/garage')} className="text-primary font-heading font-bold text-sm uppercase tracking-wider hover:underline">Go to Garage</button>
             </div>
           ) : (
             <div className="flex overflow-x-auto pb-4 -mx-2 px-2 space-x-4 snap-x">
@@ -246,7 +180,7 @@ export default function OrderFuel() {
                 onClick={() => setValue(quickValue.toString())}
                 className="flex-1 py-2 bg-surface border-2 border-border rounded-sm font-heading font-bold text-sm hover:bg-bg hover:border-primary transition-colors"
               >
-                {orderType === 'amount' ? `₹${quickValue}` : `${quickValue}L`}
+              {orderType === 'amount' ? `₹${quickValue}` : `${quickValue}L`}
               </button>
             ))}
           </div>
@@ -272,9 +206,35 @@ export default function OrderFuel() {
                     : `₹${(Number(value) * FUEL_PRICE[fuelType]).toFixed(2)}`}
                 </span>
               </div>
+              <div className="h-px bg-border my-3" />
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-muted font-body flex items-center">
+                  <Clock size={14} className="mr-1" /> Est. Delivery
+                </span>
+                <span className="font-heading font-bold text-text">{pricing.estimatedMinutes} min</span>
+              </div>
+              <div className="flex justify-between items-center text-sm mt-2">
+                <span className="text-muted font-body">Delivery Fee</span>
+                <span className="font-heading font-bold text-text">
+                  ₹{pricing.deliveryFee}
+                  {pricing.surgeActive && (
+                    <span className="text-[10px] ml-1 text-primary font-bold">PEAK</span>
+                  )}
+                </span>
+              </div>
             </motion.div>
           )}
         </section>
+
+        {/* Schedule Picker */}
+        <SchedulePicker
+          isScheduled={isScheduled}
+          scheduledDate={scheduledDate}
+          onScheduleChange={(scheduled, date) => {
+            setIsScheduled(scheduled);
+            setScheduledDate(date);
+          }}
+        />
 
         <div className="pb-8">
           <button

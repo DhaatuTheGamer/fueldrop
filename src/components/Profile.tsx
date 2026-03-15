@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { ArrowLeft, User as UserIcon, Mail, Phone, LogOut, Edit2, Check, Heart, ChevronRight, Camera } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 
 export default function Profile() {
-  const { user, setUser, setCurrentView, addNotification } = useAppContext();
+  const { user, setUser, addNotification, logout } = useAppContext();
+  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(user?.name || '');
   const [email, setEmail] = useState(user?.email || '');
@@ -18,15 +20,15 @@ export default function Profile() {
   };
 
   const handleLogout = () => {
-    setUser(null);
-    setCurrentView('login');
+    logout();
+    navigate('/login');
   };
 
   return (
     <div className="min-h-screen bg-bg flex flex-col transition-colors">
       <header className="bg-surface border-b-2 border-border px-6 py-4 flex items-center justify-between sticky top-0 z-10 transition-colors">
         <div className="flex items-center">
-          <button onClick={() => setCurrentView('home')} className="mr-4 text-text hover:text-primary transition-colors">
+          <button onClick={() => navigate('/')} className="mr-4 text-text hover:text-primary transition-colors">
             <ArrowLeft size={24} />
           </button>
           <h1 className="font-heading font-bold text-xl text-text uppercase tracking-wider">Profile</h1>
@@ -107,7 +109,7 @@ export default function Profile() {
 
         <div className="card-brutal overflow-hidden transition-colors">
           <button 
-            onClick={() => setCurrentView('favorites')}
+            onClick={() => navigate('/favorites')}
             className="w-full p-4 flex items-center justify-between hover:bg-bg transition-colors"
           >
             <div className="flex items-center">

@@ -1,5 +1,6 @@
 import React from 'react';
-import { AppProvider, useAppContext } from './context/AppContext';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { useAppContext } from './context/AppContext';
 import Login from './components/Login';
 import Home from './components/Home';
 import Profile from './components/Profile';
@@ -13,51 +14,40 @@ import NotificationToast from './components/NotificationToast';
 import Settings from './components/Settings';
 import Legal from './components/Legal';
 import About from './components/About';
-
 import Favorites from './components/Favorites';
+import Onboarding from './components/Onboarding';
+import ProtectedRoute from './components/ProtectedRoute';
 
-function AppContent() {
-  const { currentView } = useAppContext();
+function AppRoutes() {
+  const { user } = useAppContext();
 
-  switch (currentView) {
-    case 'login':
-      return <Login />;
-    case 'home':
-      return <Home />;
-    case 'profile':
-      return <Profile />;
-    case 'garage':
-      return <Garage />;
-    case 'order':
-      return <OrderFuel />;
-    case 'checkout':
-      return <Checkout />;
-    case 'tracking':
-      return <LiveTracking />;
-    case 'rating':
-      return <Rating />;
-    case 'history':
-      return <OrderHistory />;
-    case 'settings':
-      return <Settings />;
-    case 'about':
-      return <About />;
-    case 'privacy':
-      return <Legal type="privacy" />;
-    case 'terms':
-      return <Legal type="terms" />;
-    case 'favorites':
-      return <Favorites />;
-    default:
-      return <Login />;
-  }
+  return (
+    <Routes>
+      <Route path="/login" element={user ? <Navigate to="/" replace /> : <Login />} />
+      <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
+      <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+      <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+      <Route path="/garage" element={<ProtectedRoute><Garage /></ProtectedRoute>} />
+      <Route path="/order" element={<ProtectedRoute><OrderFuel /></ProtectedRoute>} />
+      <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
+      <Route path="/tracking" element={<ProtectedRoute><LiveTracking /></ProtectedRoute>} />
+      <Route path="/rating" element={<ProtectedRoute><Rating /></ProtectedRoute>} />
+      <Route path="/history" element={<ProtectedRoute><OrderHistory /></ProtectedRoute>} />
+      <Route path="/favorites" element={<ProtectedRoute><Favorites /></ProtectedRoute>} />
+      <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+      <Route path="/about" element={<ProtectedRoute><About /></ProtectedRoute>} />
+      <Route path="/privacy" element={<Legal type="privacy" />} />
+      <Route path="/terms" element={<Legal type="terms" />} />
+      <Route path="*" element={<Navigate to={user ? "/" : "/login"} replace />} />
+    </Routes>
+  );
 }
 
 export default function App() {
   return (
-    <AppProvider>
+    <>
       <NotificationToast />
-      <AppContent />
-    </AppProvider>
+      <AppRoutes />
+    </>
   );
 }

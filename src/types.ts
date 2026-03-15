@@ -39,6 +39,8 @@ export interface Order {
   totalAmount: number;
   rating?: number;
   tip?: number;
+  isScheduled?: boolean;
+  scheduledDate?: string;
 }
 
 export interface FavoriteOrder {
@@ -59,6 +61,3 @@ export interface AppNotification {
   timestamp: string;
   read: boolean;
 }
-
-export type ViewState = 'login' | 'home' | 'profile' | 'garage' | 'order' | 'checkout' | 'tracking' | 'rating' | 'history' | 'favorites' | 'settings' | 'privacy' | 'terms' | 'about';
-

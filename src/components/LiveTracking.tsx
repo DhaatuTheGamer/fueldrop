@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
-import { MapPin, Navigation, Phone, MessageSquare, CheckCircle2, Clock, Truck } from 'lucide-react';
+import { Phone, MessageSquare, CheckCircle2, Clock, Truck } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import { OrderStatus } from '../types';
 
 const statuses: OrderStatus[] = ['Pending', 'Accepted', 'Out for Delivery', 'Arriving', 'Delivered'];
 
 export default function LiveTracking() {
-  const { currentOrder, setCurrentView, addNotification } = useAppContext();
+  const { addNotification } = useAppContext();
+  const navigate = useNavigate();
   const [statusIndex, setStatusIndex] = useState(0);
-  const [eta, setEta] = useState(12 * 60); // 12 minutes in seconds
+  const [eta, setEta] = useState(12 * 60);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -27,8 +29,7 @@ export default function LiveTracking() {
         clearInterval(interval);
         return prev;
       });
-    }, 800); // Simulate status change every 0.8 seconds for fast testing
-
+    }, 800);
     return () => clearInterval(interval);
   }, []);
 
@@ -46,17 +47,17 @@ export default function LiveTracking() {
   useEffect(() => {
     if (statusIndex === statuses.length - 1) {
       setTimeout(() => {
-        setCurrentView('rating');
+        navigate('/rating');
       }, 1500);
     }
-  }, [statusIndex, setCurrentView]);
+  }, [statusIndex, navigate]);
 
   const currentStatus = statuses[statusIndex];
 
   return (
     <div className="min-h-screen bg-bg flex flex-col transition-colors">
       <div className="flex-1 relative bg-surface transition-colors">
-        {/* Simulated Map */}
+        {/* Simulated Map Area */}
         <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
           <div className="w-full h-full opacity-20" style={{
             backgroundImage: 'radial-gradient(circle at center, #E56B25 2px, transparent 2px)',

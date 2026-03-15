@@ -1,5 +1,8 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { User, Vehicle, Order, ViewState, Location, FavoriteOrder, AppNotification } from '../types';
+import { User, Vehicle, Order, Location, FavoriteOrder, AppNotification } from '../types';
+import { usePersistedState, clearPersistedState } from '../hooks/usePersistedState';
+
+const PERSISTED_KEYS = ['fd_user', 'fd_vehicles', 'fd_orders', 'fd_favorites', 'fd_darkMode', 'fd_onboarding'];
 
 interface AppContextType {
   user: User | null;
@@ -8,8 +11,6 @@ interface AppContextType {
   setVehicles: (vehicles: Vehicle[]) => void;
   orders: Order[];
   setOrders: (orders: Order[]) => void;
-  currentView: ViewState;
-  setCurrentView: (view: ViewState) => void;
   currentOrder: Partial<Order> | null;
   setCurrentOrder: (order: Partial<Order> | null) => void;
   location: Location | null;
@@ -21,20 +22,23 @@ interface AppContextType {
   markNotificationRead: (id: string) => void;
   darkMode: boolean;
   setDarkMode: (dark: boolean) => void;
+  hasCompletedOnboarding: boolean;
+  setHasCompletedOnboarding: (v: boolean) => void;
+  logout: () => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [currentView, setCurrentView] = useState<ViewState>('login');
+  const [user, setUser] = usePersistedState<User | null>('fd_user', null);
+  const [vehicles, setVehicles] = usePersistedState<Vehicle[]>('fd_vehicles', []);
+  const [orders, setOrders] = usePersistedState<Order[]>('fd_orders', []);
   const [currentOrder, setCurrentOrder] = useState<Partial<Order> | null>(null);
   const [location, setLocation] = useState<Location | null>(null);
-  const [favoriteOrders, setFavoriteOrders] = useState<FavoriteOrder[]>([]);
+  const [favoriteOrders, setFavoriteOrders] = usePersistedState<FavoriteOrder[]>('fd_favorites', []);
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
-  const [darkMode, setDarkMode] = useState(true);
+  const [darkMode, setDarkMode] = usePersistedState<boolean>('fd_darkMode', true);
+  const [hasCompletedOnboarding, setHasCompletedOnboarding] = usePersistedState<boolean>('fd_onboarding', false);
 
   useEffect(() => {
     if (darkMode) {
@@ -59,6 +63,18 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
   };
 
+  const logout = () => {
+    clearPersistedState(PERSISTED_KEYS);
+    setUser(null);
+    setVehicles([]);
+    setOrders([]);
+    setFavoriteOrders([]);
+    setHasCompletedOnboarding(false);
+    setCurrentOrder(null);
+    setLocation(null);
+    setNotifications([]);
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -68,8 +84,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         setVehicles,
         orders,
         setOrders,
-        currentView,
-        setCurrentView,
         currentOrder,
         setCurrentOrder,
         location,
@@ -81,6 +95,9 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         markNotificationRead,
         darkMode,
         setDarkMode,
+        hasCompletedOnboarding,
+        setHasCompletedOnboarding,
+        logout,
       }}
     >
       {children}
@@ -95,4 +112,3 @@ export const useAppContext = () => {
   }
   return context;
 };
-

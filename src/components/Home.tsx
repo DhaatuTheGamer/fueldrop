@@ -1,18 +1,55 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { MapPin, Bell, Fuel, Car, Clock, ChevronRight, Settings, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
+import VehicleSelectModal from './VehicleSelectModal';
 
 export default function Home() {
-  const { user, setCurrentView, orders, notifications, vehicles, setCurrentOrder, addNotification } = useAppContext();
+  const { user, orders, notifications, vehicles, setCurrentOrder, addNotification } = useAppContext();
+  const navigate = useNavigate();
   const unreadCount = notifications.filter(n => !n.read).length;
-
   const recentOrders = [...orders].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 2);
+
+  const [showVehicleModal, setShowVehicleModal] = useState(false);
+  const [pendingReorder, setPendingReorder] = useState<typeof orders[0] | null>(null);
+
+  const handleReorder = (order: typeof orders[0]) => {
+    const vehicle = vehicles.find(v => v.id === order.vehicleId);
+    if (vehicle) {
+      setCurrentOrder({
+        vehicleId: order.vehicleId,
+        fuelType: order.fuelType,
+        amountRupees: order.amountRupees,
+        quantityLiters: order.quantityLiters,
+        location: order.location,
+      });
+      navigate('/checkout');
+    } else {
+      // Vehicle deleted — show vehicle select modal instead of blocking
+      setPendingReorder(order);
+      setShowVehicleModal(true);
+    }
+  };
+
+  const handleVehicleSelected = (vehicleId: string) => {
+    if (pendingReorder) {
+      const vehicle = vehicles.find(v => v.id === vehicleId);
+      setCurrentOrder({
+        vehicleId,
+        fuelType: vehicle?.fuelType || pendingReorder.fuelType,
+        amountRupees: pendingReorder.amountRupees,
+        quantityLiters: pendingReorder.quantityLiters,
+        location: pendingReorder.location,
+      });
+      navigate('/checkout');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-bg flex flex-col transition-colors">
       <header className="bg-surface border-b-2 border-border px-6 py-4 flex items-center justify-between sticky top-0 z-10 transition-colors">
-        <div className="flex items-center cursor-pointer" onClick={() => setCurrentView('profile')}>
+        <div className="flex items-center cursor-pointer" onClick={() => navigate('/profile')}>
           <div className="w-10 h-10 bg-primary border-2 border-border rounded-sm flex items-center justify-center text-bg font-heading font-bold text-lg transition-colors shadow-brutal-sm">
             {user?.name.charAt(0) || 'U'}
           </div>
@@ -23,7 +60,7 @@ export default function Home() {
         </div>
         <div className="flex items-center space-x-3">
           <button 
-            onClick={() => setCurrentView('settings')}
+            onClick={() => navigate('/settings')}
             className="p-2 text-text border-2 border-border rounded-sm hover:border-primary hover:text-primary transition-colors bg-bg"
           >
             <Settings size={20} />
@@ -49,7 +86,7 @@ export default function Home() {
             </p>
             <h2 className="text-xl font-heading font-bold mb-4 line-clamp-1">Koramangala, Bangalore</h2>
             <button 
-              onClick={() => setCurrentView('order')}
+              onClick={() => navigate('/order')}
               className="bg-bg text-text border-2 border-border px-6 py-3 rounded-sm font-heading font-bold text-sm uppercase tracking-wider shadow-brutal hover:translate-y-[2px] hover:translate-x-[2px] hover:shadow-brutal-sm transition-all inline-flex items-center"
             >
               Order Fuel Now <ArrowRight size={16} className="ml-2" />
@@ -62,7 +99,7 @@ export default function Home() {
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.1 }}
-            onClick={() => setCurrentView('garage')}
+            onClick={() => navigate('/garage')}
             className="card-brutal p-5 flex flex-col items-center justify-center text-center hover:border-primary transition-colors group"
           >
             <div className="w-12 h-12 bg-bg border-2 border-border rounded-sm flex items-center justify-center mb-3 group-hover:scale-110 transition-transform shadow-brutal-sm">
@@ -76,7 +113,7 @@ export default function Home() {
             initial={{ opacity: 0, x: 10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
-            onClick={() => setCurrentView('history')}
+            onClick={() => navigate('/history')}
             className="card-brutal p-5 flex flex-col items-center justify-center text-center hover:border-primary transition-colors group"
           >
             <div className="w-12 h-12 bg-bg border-2 border-border rounded-sm flex items-center justify-center mb-3 group-hover:scale-110 transition-transform shadow-brutal-sm">
@@ -94,7 +131,7 @@ export default function Home() {
         >
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-heading font-bold text-lg text-text uppercase tracking-wider">Recent Orders</h3>
-            <button onClick={() => setCurrentView('history')} className="text-sm text-primary font-heading font-bold uppercase tracking-wider hover:underline">See All</button>
+            <button onClick={() => navigate('/history')} className="text-sm text-primary font-heading font-bold uppercase tracking-wider hover:underline">See All</button>
           </div>
           
           <div className="space-y-3">
@@ -122,20 +159,7 @@ export default function Home() {
                     <button 
                       onClick={(e) => {
                         e.stopPropagation();
-                        // Reorder logic
-                        const vehicle = vehicles.find(v => v.id === order.vehicleId);
-                        if (vehicle) {
-                          setCurrentOrder({
-                            vehicleId: order.vehicleId,
-                            fuelType: order.fuelType,
-                            amountRupees: order.amountRupees,
-                            quantityLiters: order.quantityLiters,
-                            location: order.location,
-                          });
-                          setCurrentView('checkout');
-                        } else {
-                          addNotification('Vehicle Not Found', 'The vehicle for this order no longer exists.', 'warning');
-                        }
+                        handleReorder(order);
                       }}
                       className="text-xs font-heading font-bold bg-surface border-2 border-border px-2 py-1 rounded-sm hover:bg-primary hover:text-bg transition-colors"
                     >
@@ -148,6 +172,13 @@ export default function Home() {
           </div>
         </motion.div>
       </main>
+
+      <VehicleSelectModal
+        isOpen={showVehicleModal}
+        onClose={() => setShowVehicleModal(false)}
+        onSelect={handleVehicleSelected}
+        title="Vehicle Deleted"
+      />
     </div>
   );
 }
