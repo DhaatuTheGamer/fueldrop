@@ -1,6 +1,8 @@
 # FuelDrop
 
 [![CI](https://github.com/DhaatuTheGamer/fueldrop/actions/workflows/ci.yml/badge.svg)](https://github.com/DhaatuTheGamer/fueldrop/actions)
+![Version](https://img.shields.io/badge/version-2.0.0-E56B25)
+![License](https://img.shields.io/badge/license-MIT-2B825B)
 
 FuelDrop is a cutting-edge, React-powered fuel delivery platform that redefines how users refuel their vehicles. By bridging the gap between fuel stations and consumers, it offers an on-demand service that is both convenient and transparent.
 
@@ -33,7 +35,10 @@ FuelDrop is a cutting-edge, React-powered fuel delivery platform that redefines 
 - **🚗 Vehicle Garage**: Add and manage profiles for multiple vehicles with specific fuel requirements.
 - **⛽ Smart Ordering**: Precise ordering by volume (liters) or value (rupees) with dynamic pricing.
 - **📍 Real-time Tracking**: Live delivery status updates, captain assignment, and ETA tracking.
-- **📊 Order Insights**: Comprehensive history of past and ongoing deliveries.
+- **📊 Order Insights**: Comprehensive history of past and ongoing deliveries with filters & search.
+- **❤️ Favorite Orders**: Save and quickly reorder your most common fuel deliveries.
+- **🌙 Dark Mode**: Full light/dark theme support with a neo-brutalist design system.
+- **⭐ Captain Rating**: Rate your delivery captain and leave tips after each order.
 - **📱 Mobile-First Design**: Fully responsive UI built for the modern mobile user.
 
 ---
@@ -45,7 +50,7 @@ FuelDrop is a cutting-edge, React-powered fuel delivery platform that redefines 
 | **React 19** | UI Framework | Leverages the latest concurrent rendering features for a smooth UX. |
 | **TypeScript** | Language | Ensures type safety and improves developer productivity. |
 | **Vite** | Build Tool | Provides near-instant Hot Module Replacement (HMR) and optimized builds. |
-| **Tailwind CSS** | Styling | Utility-first approach for rapid, consistent, and responsive UI development. |
+| **Tailwind CSS 4** | Styling | Utility-first approach for rapid, consistent, and responsive UI development. |
 | **Motion** | Animation | Adds fluid, premium micro-animations to improve user engagement. |
 | **Lucide React** | Icons | A beautiful and consistent icon set for modern interfaces. |
 
@@ -55,8 +60,8 @@ FuelDrop is a cutting-edge, React-powered fuel delivery platform that redefines 
 
 ### Prerequisites
 
-- **Node.js**: Version 18.0 or higher
-- **Package Manager**: npm (v9+) or yarn
+- **Node.js**: Version 22.0 or higher (LTS recommended)
+- **Package Manager**: npm (v10+) or yarn
 - **Browser**: Modern evergreen browser (Chrome, Edge, Firefox, Safari)
 
 ### Installation
@@ -86,8 +91,9 @@ FuelDrop is a cutting-edge, React-powered fuel delivery platform that redefines 
 
 To order fuel, follow these simple steps:
 
-1. **Select Vehicle**: Choose a registered vehicle from your garage.
-2. **Set Amount**:
+1. **Login**: Enter your mobile number and verify with OTP (`1234` for testing).
+2. **Add a Vehicle**: Go to the Garage and add your car or bike.
+3. **Select Vehicle & Set Amount**:
    ```typescript
    // Example of order state
    const order = {
@@ -96,8 +102,9 @@ To order fuel, follow these simple steps:
      type: 'volume'
    };
    ```
-3. **Checkout**: Review the price breakdown including delivery fees.
-4. **Track**: Monitor your "Captain" as they make their way to your location.
+4. **Checkout**: Review the price breakdown including delivery fees and GST.
+5. **Track**: Monitor your "Captain" as they make their way to your location.
+6. **Rate**: Provide feedback and an optional tip after delivery.
 
 ---
 
@@ -106,14 +113,18 @@ To order fuel, follow these simple steps:
 ```text
 fueldrop/
 ├── src/
-│   ├── components/     # Atomic UI components and layout wrappers
-│   ├── context/        # Global state management (Auth, Theme, Cart)
-│   ├── App.tsx         # Root component & Routing
+│   ├── components/     # UI components (Login, Home, Garage, OrderFuel, etc.)
+│   ├── context/        # Global state management (AppContext)
+│   ├── App.tsx         # Root component & view routing
 │   ├── main.tsx        # Entry point
+│   ├── index.css       # Design system (Tailwind theme, brutalist utilities)
 │   └── types.ts        # Shared TypeScript interfaces
-├── public/             # Static assets (images, pwa icons)
+├── .github/
+│   └── workflows/      # CI pipeline (lint + build)
+├── index.html          # HTML entry with SEO meta tags
 ├── vite.config.ts      # Build configuration
-└── tsconfig.json       # TypeScript compiler settings
+├── tsconfig.json       # TypeScript compiler settings
+└── package.json        # Dependencies & scripts
 ```
 
 ---
@@ -144,7 +155,7 @@ npm run lint
 npm run build
 ```
 
-*Note: Unit tests with Vitest/Jest are planned for future releases.*
+*Note: Unit tests with Vitest are planned for future releases.*
 
 ---
 

@@ -1,7 +1,0 @@
-{
-  "name": "FuelDrop",
-  "description": "A modern web application to order fuel directly to your doorstep.",
-  "requestFramePermissions": [
-    "geolocation"
-  ]
-}

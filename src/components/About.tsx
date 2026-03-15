@@ -20,7 +20,7 @@ export default function About() {
             <Fuel size={48} />
           </div>
           <h2 className="text-3xl font-heading font-bold text-text tracking-tight">FuelDrop</h2>
-          <p className="text-muted font-body mt-1 text-center">Version 1.0.0</p>
+          <p className="text-muted font-body mt-1 text-center">Version 2.0.0</p>
         </div>
 
         <div className="card-brutal p-6 space-y-4 transition-colors">
