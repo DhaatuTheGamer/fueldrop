@@ -1,134 +1,162 @@
 
-# FuelDelivery App DEMO
+# FuelDrop
 
-FuelDelivery App DEMO is a React-based application designed for users to conveniently order fuel delivery to their doorstep. It emphasizes speed, simplicity, trust, and transparency in the ordering process. The application is built with a modern frontend stack and aims to provide a seamless user experience.
+A modern, React-based fuel delivery application that brings convenience and transparency to fuel ordering. Users can seamlessly order fuel by liters or rupees, track deliveries in real-time, and manage their vehicles—all from their mobile devices. Built with a focus on speed, simplicity, and trust, FuelDrop simulates a complete fuel delivery experience with features like OTP authentication, live tracking, and order history.
 
 ## Table of Contents
 
 - [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
+- [Technologies Used](#technologies-used)
 - [Prerequisites](#prerequisites)
-- [Setup and Running](#setup-and-running)
-  - [File Placement](#file-placement)
-  - [Environment Variables (Gemini API)](#environment-variables-gemini-api)
-  - [Launch](#launch)
-- [Key User Flows](#key-user-flows)
-- [Simulated Features](#simulated-features)
-- [API Key Handling](#api-key-handling)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Project Structure](#project-structure)
+- [Contributing](#contributing)
+- [Testing](#testing)
+- [License](#license)
 
 ## Features
 
--   Splash Screen
--   Mobile Number Login with OTP Verification (Simulated)
--   Minimal User Profile Setup & Editing
--   Vehicle Management (Add/Edit/List/Delete)
--   Location-based Service (Simulated, with placeholder map)
--   Fuel Ordering by Litres or Rupees
--   Real-time Price Calculation & Breakdown
--   Checkout Process (Simulated Payment)
--   Order Placement Confirmation
--   Live Order Tracking (Simulated Captain Assignment, Movement & ETA)
--   Rate and Tip Delivery Experience (Simulated)
--   Order History (Ongoing and Past Orders)
--   Help & Support Section (FAQs, Contact Stubs)
--   User Profile & Settings Management (Logout, links to privacy/terms)
--   Responsive Design using Tailwind CSS
--   Client-side routing with React Router
--   State management using React Context API
+- **User Authentication**: Secure login with mobile OTP verification (simulated)
+- **Vehicle Management**: Add, edit, and manage multiple vehicles
+- **Fuel Ordering**: Order by liters or rupees with real-time price calculation
+- **Live Tracking**: Real-time order tracking with captain assignment and ETA
+- **Order History**: View ongoing and past orders
+- **Responsive Design**: Mobile-first design using Tailwind CSS
+- **State Management**: Efficient global state using React Context API
+- **Simulated Backend**: All operations use localStorage for demonstration
 
-## Tech Stack
+## Technologies Used
 
--   **React 19:** (Loaded via `importmap` from `esm.sh`)
--   **TypeScript:** For type safety and improved developer experience.
--   **React Router v7:** For client-side navigation (using `HashRouter`).
--   **Tailwind CSS:** For utility-first styling (loaded via CDN).
--   **Lucide React:** For icons (loaded via `importmap` from `esm.sh`).
--   **React Context API:** For global state management (Authentication, Vehicles, Orders).
--   **ES6 Modules:** Application structured with ES6 modules.
-
-## Project Structure
-
-The project follows a standard structure for React applications:
-
-```
-/
-├── components/       # Reusable UI components (Button, Input, etc.)
-├── contexts/         # React Context for global state (AuthContext, VehicleContext, OrderContext)
-├── hooks/            # Custom React Hooks (useLocation)
-├── screens/          # Top-level page/view components (HomeScreen, LoginScreen, etc.)
-├── App.tsx           # Main application component with routing setup
-├── index.tsx         # Entry point of the React application, mounts App
-├── constants.ts      # Application-wide constants (API keys, URLs, default values)
-├── types.ts          # TypeScript type definitions and enums
-├── index.html        # Main HTML file, includes Tailwind CSS and importmap
-├── metadata.json     # Application metadata (name, description, permissions)
-├── README.md         # This file
-└── .env              # (To be created by user) For environment variables like API_KEY (MUST be gitignored)
-```
+- **Frontend Framework**: React 19 with TypeScript
+- **Build Tool**: Vite
+- **Styling**: Tailwind CSS
+- **Icons**: Lucide React
+- **Routing**: React Router v7
+- **State Management**: React Context API
+- **AI Integration**: Google Gemini API (configured for future features)
+- **Animation**: Motion library
 
 ## Prerequisites
 
--   A development environment configured to serve `index.html` and automatically handle the ES6 module import and transpilation of `index.tsx` (and its subsequent `.tsx` imports). This is characteristic of modern JavaScript tooling like Vite.
--   A modern web browser (e.g., Chrome, Firefox, Safari, Edge).
+- Node.js (version 18 or higher)
+- npm or yarn package manager
+- A modern web browser (Chrome, Firefox, Safari, or Edge)
+- Google Gemini API key (optional, for future AI features)
 
-## Setup and Running
+## Installation
 
-### File Placement
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/DhaatuTheGamer/fueldrop.git
+   cd fueldrop
+   ```
 
-Ensure all project files (`index.html`, `index.tsx`, `App.tsx`, and all files within `components/`, `contexts/`, `hooks/`, `screens/`, `constants.ts`, `types.ts`, `metadata.json`) are placed in their correct directory structure as outlined above.
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
 
-### Environment Variables (Gemini API)
+3. **Environment Setup** (Optional):
+   - Create a `.env` file in the root directory
+   - Add your Google Gemini API key:
+     ```
+     GEMINI_API_KEY=your_api_key_here
+     ```
+   - **Important**: Add `.env` to your `.gitignore` to keep your API key secure
 
-This application is designed to potentially integrate with Google's Gemini API. While core fuel delivery logic might not use it extensively at this stage, the setup accommodates it.
+4. **Start the development server**:
+   ```bash
+   npm run dev
+   ```
 
-1.  Create a file named `.env` in the root directory of your project.
-2.  Add your Google Gemini API key to this file:
-    ```env
-    API_KEY=YOUR_GEMINI_API_KEY
-    ```
-3.  **Important Notes:**
-    *   Replace `YOUR_GEMINI_API_KEY` with your actual API key obtained from Google AI Studio.
-    *   The API key is accessed within the application code via `process.env.API_KEY`.
-    *   The application **will not** provide any UI elements (input fields, forms, etc.) for entering or managing the API key. Its availability as an environment variable is a prerequisite.
-    *   **Crucially, add the `.env` file to your `.gitignore` file** to prevent accidentally committing your API key to version control.
+5. **Open your browser** and navigate to `http://localhost:3000`
 
-### Launch
+## Usage
 
-1.  Start your development server, ensuring it serves the project root directory (where `index.html` is located). The server must be capable of handling the direct import of `.tsx` files as ES6 modules, as specified in `index.html`.
-2.  Open the local URL provided by your development server (e.g., `http://localhost:3000`, `http://localhost:5173` for Vite, or other ports depending on your setup) in your web browser.
+### Getting Started
+1. Launch the app and view the splash screen
+2. Enter your mobile number and verify with OTP (use "1234" for demo)
+3. Set up your profile and add vehicles
+4. Start ordering fuel!
 
-The application should now be running.
+### Key Workflows
 
-## Key User Flows
+**Ordering Fuel**:
+- Select a vehicle from your garage
+- Choose fuel quantity (liters) or amount (rupees)
+- Review price breakdown and proceed to checkout
+- Confirm order and track delivery in real-time
 
-The application implements several key user flows:
+**Managing Vehicles**:
+- Add new vehicles with make, model, and fuel type
+- Edit existing vehicle details
+- Remove vehicles you no longer need
 
-1.  **First-Time User Onboarding:**
-    *   Splash Screen -> Welcome/Login Gateway (Mobile Number) -> OTP Verification -> Minimal Profile Setup.
-2.  **Core Ordering Process:**
-    *   Home/Map Dashboard (Select/Add Vehicle, Set Location) -> Order Configuration (Quantity, Price) -> Checkout & Payment (Simulated).
-3.  **Post-Order Experience:**
-    *   Order Placed & Searching for Captain -> Live Tracking Screen (Captain Info, ETA, OTP, transitions through En Route, Arrived, Fuelling, and Completed statuses) -> Rate Your Experience.
-4.  **Auxiliary Screens (via Bottom Navigation/Profile):**
-    *   My Orders (Ongoing, Past)
-    *   Help & Support (FAQs, Contact options)
-    *   Profile & Settings (Manage Profile, Logout).
+**Tracking Orders**:
+- View current order status and captain details
+- Monitor ETA and delivery progress
+- Rate your experience after completion
 
-## Simulated Features
+### Demo Features
+This is a demonstration application with simulated features:
+- OTP verification accepts "1234" as a valid code
+- All data is stored locally in your browser
+- Payment processing is UI-only
+- Location services use browser geolocation or defaults
+- Delivery tracking is simulated with timed status updates
 
-Please be aware that several features are currently **simulated** for demonstration and development purposes. They do not connect to live backend services or perform real-world actions:
+## Project Structure
 
--   **User Authentication:** OTP verification is mocked (e.g., accepts "1234"). User data is stored in `localStorage`.
--   **Backend Operations:** All data (vehicles, orders) is stored and managed in `localStorage`. There are no actual API calls to a remote backend.
--   **Payment Processing:** Payment steps are UI-only simulations. No real payment gateways are integrated.
--   **Location Services & Maps:** Location detection uses browser geolocation (if permitted) or defaults. The map display is a placeholder (`MapPlaceholder.tsx`) and does not show real-time GPS data or dynamic routing.
--   **Delivery Captain Logic:** Assignment, ETA calculation, and status progression (including Searching, Assigned, En Route, Arrived, Fuelling, and Completed) are simulated using `setTimeout` and predefined logic.
--   **Push Notifications:** Described in flows but not implemented as actual system notifications.
+```
+fueldrop/
+├── src/
+│   ├── components/     # Reusable UI components
+│   ├── context/        # React Context for state management
+│   ├── App.tsx         # Main application component
+│   ├── main.tsx        # Application entry point
+│   ├── index.css       # Global styles
+│   └── types.ts        # TypeScript definitions
+├── public/             # Static assets
+├── index.html          # Main HTML file
+├── package.json        # Dependencies and scripts
+├── vite.config.ts      # Vite configuration
+├── tsconfig.json       # TypeScript configuration
+└── README.md           # This file
+```
 
-## API Key Handling
+## Contributing
 
-As per the @google/genai coding guidelines:
-- The Gemini API key **must** be obtained **exclusively** from the environment variable `process.env.API_KEY`.
-- The application code will use `new GoogleGenAI({ apiKey: process.env.API_KEY })` for initializing the Gemini client if and when Gemini features are implemented.
-- The application **must not** include any UI elements or code snippets for users to enter, manage, or configure the API key. The availability of `process.env.API_KEY` is assumed to be handled externally in the deployment/development environment.
+We welcome contributions to improve FuelDrop! Here's how you can help:
+
+1. **Fork the repository**
+2. **Create a feature branch**: `git checkout -b feature/your-feature-name`
+3. **Make your changes** and ensure they follow our code style
+4. **Run tests**: `npm run lint` to check for TypeScript errors
+5. **Commit your changes**: `git commit -m 'Add some feature'`
+6. **Push to the branch**: `git push origin feature/your-feature-name`
+7. **Open a Pull Request**
+
+### Guidelines
+- Follow the existing code style and TypeScript conventions
+- Add comments for complex logic
+- Test your changes thoroughly
+- Update documentation as needed
+
+## Testing
+
+Run the TypeScript compiler to check for type errors and potential issues:
+
+```bash
+npm run lint
+```
+
+This project currently uses TypeScript's built-in type checking. For comprehensive testing, consider adding unit tests with Jest and React Testing Library in future iterations.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+**FuelDrop** - Bringing fuel delivery to your doorstep with modern web technology.
