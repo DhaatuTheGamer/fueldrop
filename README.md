@@ -2,162 +2,158 @@
 
 [![CI](https://github.com/DhaatuTheGamer/fueldrop/actions/workflows/ci.yml/badge.svg)](https://github.com/DhaatuTheGamer/fueldrop/actions)
 
-A modern, React-based fuel delivery application that brings convenience and transparency to fuel ordering. Users can seamlessly order fuel by liters or rupees, track deliveries in real-time, and manage their vehicles—all from their mobile devices. Built with a focus on speed, simplicity, and trust, FuelDrop simulates a complete fuel delivery experience with features like OTP authentication, live tracking, and order history.
+FuelDrop is a cutting-edge, React-powered fuel delivery platform that redefines how users refuel their vehicles. By bridging the gap between fuel stations and consumers, it offers an on-demand service that is both convenient and transparent.
 
-## Table of Contents
+## 🚀 The Problem & Solution
 
-- [Features](#features)
-- [Technologies Used](#technologies-used)
-- [Prerequisites](#prerequisites)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Project Structure](#project-structure)
-- [Contributing](#contributing)
-- [Testing](#testing)
-- [License](#license)
+**The Problem:** Traditional refueling often involves long wait times, inconvenient detours, and lack of real-time tracking for businesses managing multiple vehicles.
 
-## Features
+**The Solution:** FuelDrop brings the fuel station to the user. Whether it's a single car at home or a fleet at a warehouse, FuelDrop provides a seamless ordering experience with real-time tracking, secure authentication, and comprehensive order history.
 
-- **User Authentication**: Secure login with mobile OTP verification (simulated)
-- **Vehicle Management**: Add, edit, and manage multiple vehicles
-- **Fuel Ordering**: Order by liters or rupees with real-time price calculation
-- **Live Tracking**: Real-time order tracking with captain assignment and ETA
-- **Order History**: View ongoing and past orders
-- **Responsive Design**: Mobile-first design using Tailwind CSS
-- **State Management**: Efficient global state using React Context API
-- **Simulated Backend**: All operations use localStorage for demonstration
+---
 
-## Technologies Used
+## 📋 Table of Contents
 
-- **Frontend Framework**: React 19 with TypeScript
-- **Build Tool**: Vite
-- **Styling**: Tailwind CSS
-- **Icons**: Lucide React
-- **Routing**: React Router v7
-- **State Management**: React Context API
-- **AI Integration**: Google Gemini API (configured for future features)
-- **Animation**: Motion library
+- [Features](#-features)
+- [Tech Stack](#-tech-stack)
+- [Getting Started](#-getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+- [Usage Guide](#-usage-guide)
+- [Project Structure](#-project-structure)
+- [Contributing](#-contributing)
+- [Testing](#-testing)
+- [License](#-license)
 
-## Prerequisites
+---
 
-- Node.js (version 18 or higher)
-- npm or yarn package manager
-- A modern web browser (Chrome, Firefox, Safari, or Edge)
-- Google Gemini API key (optional, for future AI features)
+## ✨ Features
 
-## Installation
+- **🔐 Secure Authentication**: Mobile-first OTP verification (simulated) for user security.
+- **🚗 Vehicle Garage**: Add and manage profiles for multiple vehicles with specific fuel requirements.
+- **⛽ Smart Ordering**: Precise ordering by volume (liters) or value (rupees) with dynamic pricing.
+- **📍 Real-time Tracking**: Live delivery status updates, captain assignment, and ETA tracking.
+- **📊 Order Insights**: Comprehensive history of past and ongoing deliveries.
+- **📱 Mobile-First Design**: Fully responsive UI built for the modern mobile user.
 
-1. **Clone the repository**:
+---
+
+## 🛠 Tech Stack
+
+| Technology | Purpose | Why? |
+| :--- | :--- | :--- |
+| **React 19** | UI Framework | Leverages the latest concurrent rendering features for a smooth UX. |
+| **TypeScript** | Language | Ensures type safety and improves developer productivity. |
+| **Vite** | Build Tool | Provides near-instant Hot Module Replacement (HMR) and optimized builds. |
+| **Tailwind CSS** | Styling | Utility-first approach for rapid, consistent, and responsive UI development. |
+| **Motion** | Animation | Adds fluid, premium micro-animations to improve user engagement. |
+| **Lucide React** | Icons | A beautiful and consistent icon set for modern interfaces. |
+
+---
+
+## 🏁 Getting Started
+
+### Prerequisites
+
+- **Node.js**: Version 18.0 or higher
+- **Package Manager**: npm (v9+) or yarn
+- **Browser**: Modern evergreen browser (Chrome, Edge, Firefox, Safari)
+
+### Installation
+
+1. **Clone the repository**
    ```bash
    git clone https://github.com/DhaatuTheGamer/fueldrop.git
    cd fueldrop
    ```
 
-2. **Install dependencies**:
+2. **Install dependencies**
    ```bash
    npm install
    ```
 
-3. **Environment Setup** (Optional):
-   - Create a `.env` file in the root directory
-   - Add your Google Gemini API key:
-     ```
-     GEMINI_API_KEY=your_api_key_here
-     ```
-   - **Important**: Add `.env` to your `.gitignore` to keep your API key secure
-
-4. **Start the development server**:
+3. **Launch Development Server**
    ```bash
    npm run dev
    ```
-
-5. **Open your browser** and navigate to `http://localhost:3000`
-
-## Usage
-
-### Getting Started
-1. Launch the app and view the splash screen
-2. Enter your mobile number and verify with OTP (use "1234" for demo)
-3. Set up your profile and add vehicles
-4. Start ordering fuel!
-
-### Key Workflows
-
-**Ordering Fuel**:
-- Select a vehicle from your garage
-- Choose fuel quantity (liters) or amount (rupees)
-- Review price breakdown and proceed to checkout
-- Confirm order and track delivery in real-time
-
-**Managing Vehicles**:
-- Add new vehicles with make, model, and fuel type
-- Edit existing vehicle details
-- Remove vehicles you no longer need
-
-**Tracking Orders**:
-- View current order status and captain details
-- Monitor ETA and delivery progress
-- Rate your experience after completion
-
-### Demo Features
-This is a demonstration application with simulated features:
-- OTP verification accepts "1234" as a valid code
-- All data is stored locally in your browser
-- Payment processing is UI-only
-- Location services use browser geolocation or defaults
-- Delivery tracking is simulated with timed status updates
-
-## Project Structure
-
-```
-fueldrop/
-├── src/
-│   ├── components/     # Reusable UI components
-│   ├── context/        # React Context for state management
-│   ├── App.tsx         # Main application component
-│   ├── main.tsx        # Application entry point
-│   ├── index.css       # Global styles
-│   └── types.ts        # TypeScript definitions
-├── public/             # Static assets
-├── index.html          # Main HTML file
-├── package.json        # Dependencies and scripts
-├── vite.config.ts      # Vite configuration
-├── tsconfig.json       # TypeScript configuration
-└── README.md           # This file
-```
-
-## Contributing
-
-We welcome contributions to improve FuelDrop! Here's how you can help:
-
-1. **Fork the repository**
-2. **Create a feature branch**: `git checkout -b feature/your-feature-name`
-3. **Make your changes** and ensure they follow our code style
-4. **Run tests**: `npm run lint` to check for TypeScript errors
-5. **Commit your changes**: `git commit -m 'Add some feature'`
-6. **Push to the branch**: `git push origin feature/your-feature-name`
-7. **Open a Pull Request**
-
-### Guidelines
-- Follow the existing code style and TypeScript conventions
-- Add comments for complex logic
-- Test your changes thoroughly
-- Update documentation as needed
-
-## Testing
-
-Run the TypeScript compiler to check for type errors and potential issues:
-
-```bash
-npm run lint
-```
-
-This project currently uses TypeScript's built-in type checking. For comprehensive testing, consider adding unit tests with Jest and React Testing Library in future iterations.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+   Open [http://localhost:3000](http://localhost:3000) to view the application.
 
 ---
 
-**FuelDrop** - Bringing fuel delivery to your doorstep with modern web technology.
+## 📖 Usage Guide
+
+### Refueling Workflow
+
+To order fuel, follow these simple steps:
+
+1. **Select Vehicle**: Choose a registered vehicle from your garage.
+2. **Set Amount**:
+   ```typescript
+   // Example of order state
+   const order = {
+     vehicleId: 'v123',
+     amount: 50, // Liters
+     type: 'volume'
+   };
+   ```
+3. **Checkout**: Review the price breakdown including delivery fees.
+4. **Track**: Monitor your "Captain" as they make their way to your location.
+
+---
+
+## 📂 Project Structure
+
+```text
+fueldrop/
+├── src/
+│   ├── components/     # Atomic UI components and layout wrappers
+│   ├── context/        # Global state management (Auth, Theme, Cart)
+│   ├── App.tsx         # Root component & Routing
+│   ├── main.tsx        # Entry point
+│   └── types.ts        # Shared TypeScript interfaces
+├── public/             # Static assets (images, pwa icons)
+├── vite.config.ts      # Build configuration
+└── tsconfig.json       # TypeScript compiler settings
+```
+
+---
+
+## 🤝 Contributing
+
+We love contributions! Whether it's a bug fix, a new feature, or improved documentation, satisfy your curiosity by helping us build FuelDrop.
+
+1. **Fork** the project.
+2. **Create** your feature branch (`git checkout -b feature/AmazingFeature`).
+3. **Commit** your changes (`git commit -m 'Add some AmazingFeature'`).
+4. **Push** to the branch (`git push origin feature/AmazingFeature`).
+5. **Open** a Pull Request.
+
+Please adhere to our [Code of Conduct](https://www.contributor-covenant.org/version/2/1/code_of_conduct/code_of_conduct.md).
+
+---
+
+## 🧪 Testing
+
+Maintain high code quality by running our validation suite:
+
+```bash
+# Run TypeScript type-checking
+npm run lint
+
+# Verify the production build
+npm run build
+```
+
+*Note: Unit tests with Vitest/Jest are planned for future releases.*
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for the full text.
+
+---
+
+<p align="center">
+  Built with ❤️ by the FuelDrop Team
+</p>
