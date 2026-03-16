@@ -29,7 +29,7 @@ export default function OfflineBanner() {
           initial={{ y: -60, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: -60, opacity: 0 }}
-          className="fixed top-0 left-0 right-0 z-[9999] bg-red-500 text-white px-4 py-3 flex items-center justify-center space-x-2 border-b-2 border-border shadow-brutal-sm"
+          className="fixed top-0 left-0 right-0 z-9999 bg-red-500 text-white px-4 py-3 flex items-center justify-center space-x-2 border-b-2 border-border shadow-brutal-sm"
         >
           <WifiOff size={18} className="animate-pulse" />
           <span className="font-heading font-bold text-sm uppercase tracking-wider">
@@ -42,7 +42,7 @@ export default function OfflineBanner() {
           initial={{ y: -60, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: -60, opacity: 0 }}
-          className="fixed top-0 left-0 right-0 z-[9999] bg-accent text-white px-4 py-3 flex items-center justify-center space-x-2 border-b-2 border-border shadow-brutal-sm"
+          className="fixed top-0 left-0 right-0 z-9999 bg-accent text-white px-4 py-3 flex items-center justify-center space-x-2 border-b-2 border-border shadow-brutal-sm"
         >
           <Wifi size={18} />
           <span className="font-heading font-bold text-sm uppercase tracking-wider">

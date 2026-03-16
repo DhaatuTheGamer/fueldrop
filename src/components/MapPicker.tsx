@@ -197,7 +197,7 @@ export default function MapPicker({ location, onLocationSelect, className = '' }
         )}
 
         {isLoading && (
-          <div className="absolute inset-0 bg-bg/60 flex items-center justify-center z-[1000]">
+          <div className="absolute inset-0 bg-bg/60 flex items-center justify-center z-1000">
             <Loader2 size={28} className="text-primary animate-spin" />
           </div>
         )}

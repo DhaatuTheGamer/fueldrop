@@ -183,7 +183,7 @@ export default function Home() {
                       </div>
                       <button
                         onClick={() => navigate('/order')}
-                        className="text-xs font-heading font-bold bg-primary text-bg px-3 py-1.5 rounded-sm border-2 border-border shadow-brutal-sm hover:translate-y-[1px] hover:shadow-none transition-all"
+                        className="text-xs font-heading font-bold bg-primary text-bg px-3 py-1.5 rounded-sm border-2 border-border shadow-brutal-sm hover:translate-y-px hover:shadow-none transition-all"
                       >
                         REFILL
                       </button>
