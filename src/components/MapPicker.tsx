@@ -2,19 +2,16 @@ import React, { useEffect, useRef, useState } from 'react';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import { Location } from '../types';
-import { MapPin, Navigation, Loader2, Bookmark, Plus, X, Home, Briefcase, Dumbbell, Coffee } from 'lucide-react';
+import { MapPin, Navigation, Loader2, Bookmark, X, Home, Briefcase, Dumbbell, Coffee } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useAppContext } from '../context/AppContext';
 
 // Fix Leaflet default marker icon issue
-const markerIcon = new L.Icon({
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
   iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
 });
 
 function DraggableMarker({ position, onDragEnd }: { position: [number, number]; onDragEnd: (lat: number, lng: number) => void }) {
@@ -29,7 +26,6 @@ function DraggableMarker({ position, onDragEnd }: { position: [number, number]; 
   return (
     <Marker
       position={position}
-      icon={markerIcon}
       draggable
       ref={markerRef}
       eventHandlers={{

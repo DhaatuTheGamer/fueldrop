@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowLeft, Car, Fuel, Plus, Trash2, ArrowRight, Users, MapPin } from 'lucide-react';
+import { ArrowLeft, Car, Fuel, Plus, Trash2, ArrowRight, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import { FuelType, Vehicle } from '../types';

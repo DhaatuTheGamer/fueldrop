@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowLeft, Heart, Trash2, Edit2, ArrowRight, Fuel, MapPin, Car } from 'lucide-react';
+import { ArrowLeft, Heart, Trash2, Edit2, ArrowRight, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import VehicleSelectModal from './VehicleSelectModal';

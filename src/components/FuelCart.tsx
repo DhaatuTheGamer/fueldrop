@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ShoppingCart, X, Trash2, ArrowRight, Fuel } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -8,6 +8,10 @@ export default function FuelCart() {
   const { cart, setCart, vehicles, setCurrentOrder, location } = useAppContext();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+
+  const vehicleMap = useMemo(() => {
+    return new Map(vehicles.map(v => [v.id, v]));
+  }, [vehicles]);
 
   if (cart.length === 0) return null;
 
@@ -78,7 +82,7 @@ export default function FuelCart() {
 
               <div className="space-y-3 max-h-60 overflow-y-auto mb-6">
                 {cart.map((item) => {
-                  const vehicle = vehicles.find(v => v.id === item.vehicleId);
+                  const vehicle = vehicleMap.get(item.vehicleId);
                   return (
                     <div key={item.id} className="flex items-center justify-between p-3 bg-bg border-2 border-border rounded-sm">
                       <div className="flex items-center space-x-3">
