@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Phone, MessageSquare, CheckCircle2, Clock, Truck, AlertTriangle, X, Headphones, MapPin, Ban, PhoneCall, RefreshCw } from 'lucide-react';
+import { Phone, MessageSquare, CheckCircle2, Clock, Truck, AlertTriangle, X, Headphones, MapPin, Ban, PhoneCall, RefreshCw, Edit3 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import { OrderStatus } from '../types';
@@ -25,6 +25,7 @@ export default function LiveTracking() {
   
   const [eta, setEta] = useState(12 * 60);
   const [showSOS, setShowSOS] = useState(false);
+  const [graceSeconds, setGraceSeconds] = useState(60);
 
   // Sync with order bridge
   useEffect(() => {
@@ -77,6 +78,17 @@ export default function LiveTracking() {
       return () => clearTimeout(timer);
     }
   }, [currentStatus, navigate]);
+
+  // Feature 7: Modification grace period countdown
+  useEffect(() => {
+    if (currentStatus !== 'Pending') return;
+    if (graceSeconds <= 0) return;
+
+    const timer = setInterval(() => {
+      setGraceSeconds(prev => Math.max(0, prev - 1));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [currentStatus, graceSeconds]);
 
   const handleSupportOption = (id: string) => {
     setShowSOS(false);
@@ -199,6 +211,30 @@ export default function LiveTracking() {
         </div>
       </div>
 
+      {/* Feature 7: Modification Grace Period Banner */}
+      {isPending && graceSeconds > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mx-6 my-3 bg-primary/10 border-2 border-primary/30 rounded-sm p-4 z-20 relative"
+        >
+          <div className="flex items-center justify-between mb-2">
+            <p className="font-heading font-bold text-text text-sm uppercase tracking-wider flex items-center">
+              <Edit3 size={14} className="mr-2 text-primary" /> Modification Window
+            </p>
+            <span className="font-heading font-bold text-primary text-lg">
+              0:{String(graceSeconds).padStart(2, '0')}
+            </span>
+          </div>
+          <p className="text-[10px] text-muted font-body mb-3">You can still edit your order before a captain picks it up.</p>
+          <button
+            onClick={() => navigate('/order')}
+            className="btn-secondary w-full py-2 text-sm flex items-center justify-center"
+          >
+            <Edit3 size={14} className="mr-2" /> Edit Order
+          </button>
+        </motion.div>
+      )}
       <div className="bg-bg border-t-2 border-border z-20 relative transition-colors">
         <div className="w-12 h-1.5 bg-border rounded-sm mx-auto mt-4 mb-6" />
         

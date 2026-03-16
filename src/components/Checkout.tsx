@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowLeft, CreditCard, Wallet, Tag, MapPin, Fuel, ArrowRight, Heart, Calendar } from 'lucide-react';
+import { ArrowLeft, CreditCard, Wallet, Tag, MapPin, Fuel, ArrowRight, Heart, Calendar, Gift, Copy, X, Zap, MessageSquareText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import { Order } from '../types';
@@ -8,6 +8,10 @@ import SafetyChecklist from './SafetyChecklist';
 import { useDynamicPricing } from '../hooks/useDynamicPricing';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 import { publishOrder } from '../services/orderBridge';
+
+const AVAILABLE_OFFERS = [
+  { code: 'FIRST50', description: '₹50 off your first order', discount: 50, minOrder: 200 },
+];
 
 export default function Checkout() {
   const { currentOrder, setCurrentOrder, setOrders, orders, addNotification, favoriteOrders, setFavoriteOrders, cart, setCart, vehicles } = useAppContext();
@@ -19,6 +23,7 @@ export default function Checkout() {
   const [saveAsFavorite, setSaveAsFavorite] = useState(false);
   const [favoriteName, setFavoriteName] = useState('');
   const [safetyChecked, setSafetyChecked] = useState(false);
+  const [showOffersSheet, setShowOffersSheet] = useState(false);
 
   // Focus trap for confirmation modal (Feature 8)
   const confirmModalRef = useFocusTrap(showConfirmModal);
@@ -55,7 +60,8 @@ export default function Checkout() {
 
   const subtotal = allItems.reduce((sum, item) => sum + item.amountRupees, 0);
   const gst = subtotal * 0.18;
-  const total = subtotal + pricing.deliveryFee + gst - discount;
+  const emergencyFee = currentOrder.isEmergency ? 150 : 0;
+  const total = subtotal + pricing.deliveryFee + gst + emergencyFee - discount;
 
   const handleApplyPromo = () => {
     if (promoCode.toUpperCase() === 'FIRST50') {
@@ -65,6 +71,13 @@ export default function Checkout() {
       addNotification('Invalid Promo Code', 'Please enter a valid promo code.', 'warning');
       setDiscount(0);
     }
+  };
+
+  const handleCopyAndApply = (code: string) => {
+    setPromoCode(code);
+    setDiscount(50);
+    setShowOffersSheet(false);
+    addNotification('Promo Applied!', '₹50 discount applied to your order.', 'success');
   };
 
   const handlePlaceOrder = () => {
@@ -132,7 +145,7 @@ export default function Checkout() {
         <section className="card-brutal p-6 transition-colors">
           <h2 className="label-small mb-4">Order Summary</h2>
           
-          {/* Multi-item display (Feature 3) */}
+          {/* Multi-item display */}
           {allItems.map((item, idx) => {
             const vehicle = vehicles.find(v => v.id === item.vehicleId);
             return (
@@ -159,6 +172,28 @@ export default function Checkout() {
             <p className="line-clamp-2">{currentOrder.location?.address}</p>
           </div>
 
+          {/* Feature 4: Display delivery instructions */}
+          {currentOrder.deliveryInstructions && (
+            <div className="flex items-start space-x-3 text-sm text-text font-body mt-3 bg-bg border-2 border-border rounded-sm p-3">
+              <MessageSquareText size={18} className="shrink-0 text-primary mt-0.5" />
+              <div>
+                <p className="font-heading font-bold text-xs uppercase tracking-wider text-primary">Delivery Instructions</p>
+                <p className="text-muted text-xs mt-0.5">{currentOrder.deliveryInstructions}</p>
+              </div>
+            </div>
+          )}
+
+          {/* Feature 5: Emergency badge */}
+          {currentOrder.isEmergency && (
+            <div className="flex items-center space-x-3 text-sm mt-3 bg-red-500/10 border-2 border-red-500/30 rounded-sm p-3">
+              <Zap size={18} className="shrink-0 text-red-500" />
+              <div>
+                <p className="font-heading font-bold text-xs uppercase tracking-wider text-red-500">⚡ Emergency Priority</p>
+                <p className="text-muted text-[10px] mt-0.5">Your order will be dispatched with top priority</p>
+              </div>
+            </div>
+          )}
+
           {currentOrder.isScheduled && currentOrder.scheduledDate && (
             <div className="flex items-center space-x-3 text-sm text-text font-body mt-3 bg-bg border-2 border-border rounded-sm p-3">
               <Calendar size={18} className="shrink-0 text-primary" />
@@ -174,7 +209,7 @@ export default function Checkout() {
           )}
         </section>
 
-        {/* Offers */}
+        {/* Feature 2: Offers with discovery */}
         <section className="card-brutal p-6 transition-colors">
           <h2 className="label-small mb-4">Offers & Benefits</h2>
           <div className="flex space-x-2">
@@ -192,6 +227,26 @@ export default function Checkout() {
               Apply
             </button>
           </div>
+          {/* Promo hint */}
+          {discount === 0 && (
+            <button
+              onClick={() => setShowOffersSheet(true)}
+              className="mt-3 flex items-center space-x-2 text-xs text-primary font-heading font-bold uppercase tracking-wider hover:underline w-full justify-center py-2 bg-primary/5 border-2 border-primary/20 rounded-sm transition-colors"
+            >
+              <Gift size={14} />
+              <span>View Available Offers</span>
+            </button>
+          )}
+          {discount > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: -5 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-3 flex items-center space-x-2 text-xs text-accent font-heading font-bold bg-accent/10 border-2 border-accent/20 rounded-sm px-3 py-2"
+            >
+              <Tag size={14} />
+              <span>FIRST50 applied — ₹50 off!</span>
+            </motion.div>
+          )}
         </section>
 
         {/* Payment Methods */}
@@ -243,6 +298,13 @@ export default function Checkout() {
               </span>
               <span className="font-heading font-bold text-text">₹{pricing.deliveryFee.toFixed(2)}</span>
             </div>
+            {/* Feature 5: Emergency fee line item */}
+            {currentOrder.isEmergency && (
+              <div className="flex justify-between text-red-500 font-bold">
+                <span className="flex items-center"><Zap size={12} className="mr-1" /> Emergency Priority</span>
+                <span>+₹{emergencyFee.toFixed(2)}</span>
+              </div>
+            )}
             {discount > 0 && (
               <div className="flex justify-between text-primary font-bold">
                 <span>Promo Discount</span>
@@ -268,7 +330,7 @@ export default function Checkout() {
         </div>
       </main>
 
-      {/* Confirmation Modal (with focus trap - Feature 8) */}
+      {/* Confirmation Modal (with focus trap) */}
       <AnimatePresence>
         {showConfirmModal && (
           <motion.div 
@@ -304,6 +366,12 @@ export default function Checkout() {
                   <span className="text-muted">Payment</span>
                   <span className="font-heading font-bold text-text uppercase tracking-wider">{paymentMethod}</span>
                 </div>
+                {currentOrder.isEmergency && (
+                  <div className="flex justify-between text-sm font-body">
+                    <span className="text-red-500 flex items-center"><Zap size={12} className="mr-1" /> Priority</span>
+                    <span className="font-heading font-bold text-red-500">EMERGENCY</span>
+                  </div>
+                )}
               </div>
 
               <div className="mb-6">
@@ -358,6 +426,68 @@ export default function Checkout() {
                   Confirm
                 </button>
               </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Feature 2: Available Offers Bottom Sheet */}
+      <AnimatePresence>
+        {showOffersSheet && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-bg/80 backdrop-blur-sm z-50 flex items-end justify-center"
+            onClick={() => setShowOffersSheet(false)}
+          >
+            <motion.div
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-md bg-surface border-t-2 border-x-2 border-border rounded-t-sm p-6"
+            >
+              <div className="flex justify-between items-center mb-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-primary/20 border-2 border-primary rounded-sm flex items-center justify-center">
+                    <Gift size={20} className="text-primary" />
+                  </div>
+                  <h3 className="font-heading font-bold text-lg text-text uppercase tracking-wider">Available Offers</h3>
+                </div>
+                <button onClick={() => setShowOffersSheet(false)} className="text-muted hover:text-text transition-colors">
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="space-y-3">
+                {AVAILABLE_OFFERS.map((offer) => (
+                  <div
+                    key={offer.code}
+                    className="p-4 bg-bg border-2 border-border rounded-sm transition-colors"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-heading font-bold text-primary text-sm uppercase tracking-wider bg-primary/10 px-2 py-1 rounded-sm border border-primary/20">
+                        {offer.code}
+                      </span>
+                      <span className="font-heading font-bold text-accent text-lg">-₹{offer.discount}</span>
+                    </div>
+                    <p className="text-sm text-text font-body mb-3">{offer.description}</p>
+                    <p className="text-[10px] text-muted font-body mb-3">Min. order: ₹{offer.minOrder}</p>
+                    <button
+                      onClick={() => handleCopyAndApply(offer.code)}
+                      className="btn-primary w-full py-2 text-sm flex items-center justify-center"
+                    >
+                      <Copy size={14} className="mr-2" /> Copy & Apply
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              <button onClick={() => setShowOffersSheet(false)} className="btn-secondary w-full mt-4 py-3">
+                Close
+              </button>
             </motion.div>
           </motion.div>
         )}

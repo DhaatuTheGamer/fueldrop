@@ -19,6 +19,7 @@ import Onboarding from './components/Onboarding';
 import ProtectedRoute from './components/ProtectedRoute';
 import OfflineBanner from './components/OfflineBanner';
 import CaptainDashboard from './components/captain/CaptainDashboard';
+import BulkOrder from './components/BulkOrder';
 
 function AppRoutes() {
   const { user } = useAppContext();
@@ -36,6 +37,7 @@ function AppRoutes() {
       <Route path="/rating" element={<ProtectedRoute><Rating /></ProtectedRoute>} />
       <Route path="/history" element={<ProtectedRoute><OrderHistory /></ProtectedRoute>} />
       <Route path="/favorites" element={<ProtectedRoute><Favorites /></ProtectedRoute>} />
+      <Route path="/fleet" element={<ProtectedRoute><BulkOrder /></ProtectedRoute>} />
       <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
       <Route path="/about" element={<ProtectedRoute><About /></ProtectedRoute>} />
       <Route path="/privacy" element={<Legal type="privacy" />} />

@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { Star, CheckCircle2 } from 'lucide-react';
+import { Star, CheckCircle2, Leaf, Clock, Zap } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAppContext } from '../context/AppContext';
 
 export default function Rating() {
   const navigate = useNavigate();
+  const { orders } = useAppContext();
   const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
   const [tip, setTip] = useState(0);
@@ -13,9 +15,14 @@ export default function Rating() {
 
   const tips = [10, 20, 50];
 
+  // Feature 9: Calculate savings
+  const totalOrders = orders.filter(o => o.status === 'Delivered').length + 1; // +1 for current
+  const timeSavedMinutes = totalOrders * 25; // ~25 min avg trip to petrol station
+  const co2Avoided = totalOrders * 0.8; // ~0.8 kg CO₂ per avoided round-trip
+
   const handleSubmit = () => {
     setSubmitted(true);
-    setTimeout(() => navigate('/'), 2000);
+    setTimeout(() => navigate('/'), 4000);
   };
 
   if (submitted) {
@@ -30,7 +37,50 @@ export default function Rating() {
             <CheckCircle2 size={40} />
           </div>
           <h2 className="text-2xl font-heading font-bold text-text mb-2 uppercase tracking-wider">Thank You!</h2>
-          <p className="text-muted font-body">Your feedback helps us improve our service.</p>
+          <p className="text-muted font-body mb-6">Your feedback helps us improve our service.</p>
+
+          {/* Feature 9: Savings Gamification */}
+          <div className="bg-bg border-2 border-border rounded-sm p-4 space-y-3 mb-4">
+            <p className="font-heading font-bold text-text text-xs uppercase tracking-wider mb-3">Your Impact with FuelDrop</p>
+            <div className="grid grid-cols-3 gap-3">
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="text-center"
+              >
+                <div className="w-10 h-10 bg-accent/20 rounded-sm flex items-center justify-center mx-auto mb-1 border border-accent/30">
+                  <Clock size={18} className="text-accent" />
+                </div>
+                <p className="font-heading font-bold text-accent text-lg">{timeSavedMinutes}</p>
+                <p className="text-[9px] text-muted font-body uppercase">min saved</p>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="text-center"
+              >
+                <div className="w-10 h-10 bg-accent/20 rounded-sm flex items-center justify-center mx-auto mb-1 border border-accent/30">
+                  <Leaf size={18} className="text-accent" />
+                </div>
+                <p className="font-heading font-bold text-accent text-lg">{co2Avoided.toFixed(1)}</p>
+                <p className="text-[9px] text-muted font-body uppercase">kg CO₂</p>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.7 }}
+                className="text-center"
+              >
+                <div className="w-10 h-10 bg-primary/20 rounded-sm flex items-center justify-center mx-auto mb-1 border border-primary/30">
+                  <Zap size={18} className="text-primary" />
+                </div>
+                <p className="font-heading font-bold text-primary text-lg">{totalOrders}</p>
+                <p className="text-[9px] text-muted font-body uppercase">deliveries</p>
+              </motion.div>
+            </div>
+          </div>
         </motion.div>
       </div>
     );

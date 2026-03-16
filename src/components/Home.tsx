@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { MapPin, Bell, Fuel, Car, Clock, ChevronRight, Settings, ArrowRight } from 'lucide-react';
+import { MapPin, Bell, Fuel, Car, Clock, ChevronRight, Settings, ArrowRight, AlertCircle, Droplets, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import VehicleSelectModal from './VehicleSelectModal';
@@ -94,7 +94,7 @@ export default function Home() {
           </div>
         </motion.div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-3 gap-4">
           <motion.button 
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
@@ -105,8 +105,22 @@ export default function Home() {
             <div className="w-12 h-12 bg-bg border-2 border-border rounded-sm flex items-center justify-center mb-3 group-hover:scale-110 transition-transform shadow-brutal-sm">
               <Car size={24} className="text-primary" />
             </div>
-            <span className="font-heading font-bold text-text uppercase tracking-wider text-sm">My Garage</span>
-            <span className="text-xs text-muted font-body mt-1">Manage vehicles</span>
+            <span className="font-heading font-bold text-text uppercase tracking-wider text-sm">Garage</span>
+            <span className="text-xs text-muted font-body mt-1">Vehicles</span>
+          </motion.button>
+
+          <motion.button 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            onClick={() => navigate('/fleet')}
+            className="card-brutal p-5 flex flex-col items-center justify-center text-center hover:border-primary transition-colors group"
+          >
+            <div className="w-12 h-12 bg-bg border-2 border-border rounded-sm flex items-center justify-center mb-3 group-hover:scale-110 transition-transform shadow-brutal-sm">
+              <Users size={24} className="text-primary" />
+            </div>
+            <span className="font-heading font-bold text-text uppercase tracking-wider text-sm">Fleet</span>
+            <span className="text-xs text-muted font-body mt-1">Bulk order</span>
           </motion.button>
 
           <motion.button 
@@ -123,6 +137,63 @@ export default function Home() {
             <span className="text-xs text-muted font-body mt-1">Past orders</span>
           </motion.button>
         </div>
+
+        {/* Feature 6: Predictive Refill Reminders */}
+        {vehicles.filter(v => v.tankCapacity && v.avgDailyKm).length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25 }}
+          >
+            <h3 className="font-heading font-bold text-lg text-text uppercase tracking-wider mb-3 flex items-center">
+              <Droplets size={18} className="mr-2 text-primary" /> Refill Reminders
+            </h3>
+            <div className="space-y-3">
+              {vehicles.filter(v => v.tankCapacity && v.avgDailyKm).map(vehicle => {
+                const fuelEfficiency = vehicle.fuelType === 'Petrol' ? 15 : 20; // km/L estimate
+                const dailyFuelUsage = (vehicle.avgDailyKm || 1) / fuelEfficiency;
+                const daysUntilEmpty = Math.floor((vehicle.tankCapacity || 1) / dailyFuelUsage);
+                const isUrgent = daysUntilEmpty <= 3;
+                const isWarning = daysUntilEmpty <= 7;
+
+                return (
+                  <div
+                    key={vehicle.id}
+                    className={`card-brutal p-4 transition-colors ${
+                      isUrgent ? 'border-red-500 bg-red-500/5' : isWarning ? 'border-primary bg-primary/5' : ''
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <div className={`w-10 h-10 rounded-sm border-2 border-border flex items-center justify-center shadow-brutal-sm ${
+                          isUrgent ? 'bg-red-500 text-white' : 'bg-surface text-primary'
+                        }`}>
+                          {isUrgent ? <AlertCircle size={20} /> : <Car size={20} />}
+                        </div>
+                        <div>
+                          <p className="font-heading font-bold text-text text-sm uppercase tracking-wider">
+                            {vehicle.make} {vehicle.model}
+                          </p>
+                          <p className={`text-xs font-heading font-bold ${
+                            isUrgent ? 'text-red-500' : isWarning ? 'text-primary' : 'text-accent'
+                          }`}>
+                            {isUrgent ? `⚠ Refill in ~${daysUntilEmpty} days!` : `~${daysUntilEmpty} days until refill`}
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => navigate('/order')}
+                        className="text-xs font-heading font-bold bg-primary text-bg px-3 py-1.5 rounded-sm border-2 border-border shadow-brutal-sm hover:translate-y-[1px] hover:shadow-none transition-all"
+                      >
+                        REFILL
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </motion.div>
+        )}
 
         <motion.div 
           initial={{ opacity: 0, y: 10 }}

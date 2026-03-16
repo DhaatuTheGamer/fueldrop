@@ -8,6 +8,8 @@ export interface Vehicle {
   model: string;
   fuelType: FuelType;
   licensePlate: string;
+  tankCapacity?: number;  // liters
+  avgDailyKm?: number;    // km/day
 }
 
 export interface User {
@@ -45,6 +47,8 @@ export interface Order {
   vehicleMake?: string;
   vehicleModel?: string;
   licensePlate?: string;
+  deliveryInstructions?: string;
+  isEmergency?: boolean;
 }
 
 export interface FavoriteOrder {

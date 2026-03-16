@@ -5,7 +5,7 @@
 # FuelDrop
 
 [![CI](https://github.com/DhaatuTheGamer/fueldrop/actions/workflows/ci.yml/badge.svg)](https://github.com/DhaatuTheGamer/fueldrop/actions)
-![Version](https://img.shields.io/badge/version-2.0.0-E56B25)
+![Version](https://img.shields.io/badge/version-3.0.0-E56B25)
 ![License](https://img.shields.io/badge/license-MIT-2B825B)
 
 FuelDrop is a cutting-edge, React-powered fuel delivery platform that redefines how users refuel their vehicles. By bridging the gap between fuel stations and consumers, it offers an on-demand service that is both convenient and transparent.
@@ -36,16 +36,27 @@ FuelDrop is a cutting-edge, React-powered fuel delivery platform that redefines 
 
 ## ✨ Features
 
+### Core Experience
 - **🔐 Secure Authentication**: Mobile-first OTP verification (simulated) for user security.
-- **🚗 Vehicle Garage**: Add and manage profiles for multiple vehicles with specific fuel requirements.
-- **⛽ Smart Ordering**: Precise ordering by volume (liters) or value (rupees) with dynamic pricing.
+- **🚗 Vehicle Garage**: Add and manage profiles for multiple vehicles with fuel type, tank capacity, and daily usage tracking.
+- **⛽ Smart Ordering**: Precise ordering by volume (liters) or value (rupees) with dynamic pricing and auto-selection for single-vehicle users.
 - **📍 Real-time Tracking**: Live delivery status updates, captain assignment, and ETA tracking.
 - **📊 Order Insights**: Comprehensive history of past and ongoing deliveries with filters & search.
 - **❤️ Favorite Orders**: Save and quickly reorder your most common fuel deliveries.
 - **👨‍✈️ Captain Dashboard**: Dedicated interface for delivery partners to manage and fulfill orders.
 - **🌙 Dark Mode**: Full light/dark theme support with a neo-brutalist design system.
-- **⭐ Captain Rating**: Rate your delivery captain and leave tips after each order.
 - **📱 Mobile-First Design**: Fully responsive UI built for the modern mobile user.
+
+### Advanced Features
+- **🚨 Emergency Refill**: Priority dispatch toggle with +₹150 surge fee, skipping the queue and alerting captains with a visual badge.
+- **📝 Delivery Instructions**: Free-text field (200 chars) for access notes like "Park near Pillar 4B" — visible to captains throughout the delivery.
+- **🎁 Promo Code Discovery**: A "View Available Offers" bottom sheet in checkout so users never miss a discount (e.g., FIRST50).
+- **⏱️ Modification Grace Period**: 60-second countdown after placing an order to edit or undo before a captain picks it up.
+- **🔮 Predictive Refill Reminders**: Smart reminders on the home screen based on tank capacity and daily driving patterns.
+- **🚐 Fleet Mode**: Dedicated bulk ordering page (`/fleet`) to refuel multiple vehicles in a single checkout.
+- **🗺️ Navigate in Maps**: Captain can open Google Maps with one tap for turn-by-turn directions to the customer.
+- **🌿 Impact Gamification**: Post-delivery screen showing time saved, CO₂ avoided, and total deliveries completed.
+- **⭐ Captain Rating**: Rate your delivery captain and leave tips after each order.
 
 ---
 
@@ -98,14 +109,17 @@ FuelDrop is a cutting-edge, React-powered fuel delivery platform that redefines 
 Follow these steps to get fuel delivered to your doorstep:
 
 1. **Secure Login**: Enter your mobile number and authenticate using the test OTP `1234`.
-2. **Add Your Fleet**: Navigate to the **Garage** to add your vehicles. FuelDrop supports multiple vehicle profiles.
+2. **Add Your Fleet**: Navigate to the **Garage** to add your vehicles. Optionally set **tank capacity** and **avg daily km** to get smart refill reminders on the home screen.
 3. **Place an Order**: 
-    - Select a vehicle from your garage.
-    - Choose your fuel type (Petrol/Diesel/Power).
+    - If you have only one vehicle, it's **auto-selected** for you.
+    - Choose your fuel type (Petrol/Diesel).
     - Specify quantity by **Volume** (Liters) or **Value** (Rupees).
-4. **Instant Checkout**: Review the transparent pricing, including delivery fees and taxes.
-5. **Live Tracking**: Once a Captain accepts, track their real-time location and estimated arrival time on the map.
-6. **Completion & Feedback**: After delivery, rate your experience and leave a tip for your Captain.
+    - Toggle **🚨 Emergency Refill** for priority dispatch (+₹150 surge).
+    - Add optional **delivery instructions** for the captain.
+4. **Fleet Mode**: Need to refuel multiple vehicles? Use the **Fleet** button on the home screen to place a bulk order.
+5. **Instant Checkout**: Review transparent pricing. Tap **"View Available Offers"** to discover and apply promo codes like `FIRST50`.
+6. **Live Tracking**: Once a Captain accepts, track their progress in real-time. During the first **60 seconds**, you can tap **"Edit Order"** to modify your order.
+7. **Completion & Feedback**: After delivery, rate your experience and view your impact — **time saved**, **CO₂ avoided**, and **total deliveries**.
 
 ---
 
@@ -119,14 +133,15 @@ The Captain App is a dedicated interface for our delivery partners to manage the
 Navigate to `http://localhost:3000/captain` to access the Captain Dashboard. This route is publicly accessible for testing and demonstration purposes.
 
 **Captain Workflow:**
-1.  **Dashboard Overview**: View available orders in your vicinity with details like fuel type, quantity, and distance.
-2.  **Accepting Orders**: Tap **"Accept Order"** to claim a delivery.
-3.  **Status Management**: Update the order status as you progress:
+1.  **Dashboard Overview**: View available orders with fuel type, quantity, distance, and any **⚡ Emergency Priority** badges.
+2.  **Accepting Orders**: Tap **"Accept Order"** to claim a delivery. Look for **delivery instructions** from the customer (e.g., gate codes, parking notes).
+3.  **Navigate in Maps**: Tap the **"Navigate in Maps"** button to open Google Maps with turn-by-turn directions to the customer.
+4.  **Status Management**: Update the order status as you progress:
     - **Pick Up**: Mark when you've reached the station.
     - **In Transit**: Mark when you are on your way to the user.
     - **Arrived**: Notify the user when you've reached the delivery location.
-4.  **Order Completion**: Finalize the delivery once the fuel is dispensed.
-5.  **Earnings Tracking**: (Coming Soon) Track your daily earnings and completed trips.
+5.  **Order Completion**: Finalize the delivery once the fuel is dispensed.
+6.  **Earnings Tracking**: (Coming Soon) Track your daily earnings and completed trips.
 
 ---
 
@@ -135,18 +150,29 @@ Navigate to `http://localhost:3000/captain` to access the Captain Dashboard. Thi
 ```text
 fueldrop/
 ├── src/
-│   ├── components/     # UI components (Login, Home, Garage, OrderFuel, etc.)
-│   ├── context/        # Global state management (AppContext)
-│   ├── App.tsx         # Root component & view routing
-│   ├── main.tsx        # Entry point
-│   ├── index.css       # Design system (Tailwind theme, brutalist utilities)
-│   └── types.ts        # Shared TypeScript interfaces
+│   ├── components/         # UI components
+│   │   ├── captain/        # Captain dashboard & order management
+│   │   ├── Home.tsx        # Dashboard with refill reminders & fleet access
+│   │   ├── OrderFuel.tsx   # Order flow with emergency & delivery instructions
+│   │   ├── Checkout.tsx    # Checkout with promo discovery & emergency surcharge
+│   │   ├── LiveTracking.tsx # Tracking with modification grace period
+│   │   ├── BulkOrder.tsx   # Fleet mode — multi-vehicle bulk ordering
+│   │   ├── Garage.tsx      # Vehicle management with tank capacity fields
+│   │   ├── Rating.tsx      # Feedback with savings gamification
+│   │   └── ...             # Login, Profile, Settings, etc.
+│   ├── context/            # Global state management (AppContext)
+│   ├── hooks/              # Custom hooks (useDynamicPricing, useFocusTrap, etc.)
+│   ├── services/           # Order bridge (localStorage cross-tab sync)
+│   ├── App.tsx             # Root component & route configuration
+│   ├── main.tsx            # Entry point
+│   ├── index.css           # Design system (Tailwind theme, brutalist utilities)
+│   └── types.ts            # Shared TypeScript interfaces
 ├── .github/
-│   └── workflows/      # CI pipeline (lint + build)
-├── index.html          # HTML entry with SEO meta tags
-├── vite.config.ts      # Build configuration
-├── tsconfig.json       # TypeScript compiler settings
-└── package.json        # Dependencies & scripts
+│   └── workflows/          # CI pipeline (lint + build)
+├── index.html              # HTML entry with SEO meta tags
+├── vite.config.ts          # Build configuration
+├── tsconfig.json           # TypeScript compiler settings
+└── package.json            # Dependencies & scripts
 ```
 
 ---

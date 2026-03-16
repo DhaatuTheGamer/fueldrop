@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'motion/react';
-import { ArrowLeft, Car, Fuel as FuelIcon, ArrowRight, Clock, TrendingDown, TrendingUp, ShoppingCart, Plus } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+import { ArrowLeft, Car, Fuel as FuelIcon, ArrowRight, Clock, TrendingDown, TrendingUp, ShoppingCart, Plus, Zap, MessageSquareText, CheckCircle2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import { FuelType } from '../types';
@@ -61,11 +61,23 @@ export default function OrderFuel() {
   const [isScheduled, setIsScheduled] = useState(false);
   const [scheduledDate, setScheduledDate] = useState('');
   const [pricingLoading, setPricingLoading] = useState(false);
+  const [deliveryInstructions, setDeliveryInstructions] = useState('');
+  const [isEmergency, setIsEmergency] = useState(false);
+  const [autoSelected, setAutoSelected] = useState(false);
 
   const FUEL_PRICE = {
     Petrol: 101.5,
     Diesel: 89.2,
   };
+
+  // Feature 1: Auto-select single vehicle
+  useEffect(() => {
+    if (vehicles.length === 1 && !selectedVehicle) {
+      setSelectedVehicle(vehicles[0].id);
+      setFuelType(vehicles[0].fuelType);
+      setAutoSelected(true);
+    }
+  }, [vehicles, selectedVehicle]);
 
   const numValue = Number(value) || 0;
   const quantityLiters = orderType === 'quantity' ? numValue : numValue / FUEL_PRICE[fuelType];
@@ -115,6 +127,8 @@ export default function OrderFuel() {
       location,
       isScheduled,
       scheduledDate: isScheduled ? scheduledDate : undefined,
+      deliveryInstructions: deliveryInstructions.trim() || undefined,
+      isEmergency,
     });
     navigate('/checkout');
   };
@@ -182,13 +196,20 @@ export default function OrderFuel() {
                   onClick={() => {
                     setSelectedVehicle(vehicle.id);
                     setFuelType(vehicle.fuelType);
+                    setAutoSelected(false);
                   }}
-                  className={`shrink-0 w-40 p-4 rounded-sm border-2 text-left snap-start transition-all ${
+                  className={`shrink-0 w-40 p-4 rounded-sm border-2 text-left snap-start transition-all relative ${
                     selectedVehicle === vehicle.id
                       ? 'border-primary bg-surface shadow-brutal-sm'
                       : 'border-border bg-bg hover:border-muted'
                   }`}
                 >
+                  {/* Feature 1: Auto-selected badge */}
+                  {autoSelected && selectedVehicle === vehicle.id && (
+                    <span className="absolute -top-2 -right-2 bg-accent text-bg text-[9px] font-heading font-bold px-1.5 py-0.5 rounded-sm border-2 border-border flex items-center">
+                      <CheckCircle2 size={10} className="mr-0.5" /> AUTO
+                    </span>
+                  )}
                   <Car size={24} className={`mb-2 ${selectedVehicle === vehicle.id ? 'text-primary' : 'text-muted'}`} />
                   <p className="font-heading font-bold text-text truncate">{vehicle.make} {vehicle.model}</p>
                   <p className="text-xs text-muted font-body mt-1">{vehicle.licensePlate}</p>
@@ -221,7 +242,7 @@ export default function OrderFuel() {
             </button>
           </div>
 
-          {/* Price Trend Indicator (Feature 1) */}
+          {/* Price Trend Indicator */}
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -297,7 +318,7 @@ export default function OrderFuel() {
                 onClick={() => setValue(quickValue.toString())}
                 className="flex-1 py-2 bg-surface border-2 border-border rounded-sm font-heading font-bold text-sm hover:bg-bg hover:border-primary transition-colors"
               >
-              {orderType === 'amount' ? `₹${quickValue}` : `${quickValue}L`}
+            {orderType === 'amount' ? `₹${quickValue}` : `${quickValue}L`}
               </button>
             ))}
           </div>
@@ -363,7 +384,65 @@ export default function OrderFuel() {
           }}
         />
 
-        {/* Action Buttons (Feature 3 - Add to Cart + Continue) */}
+        {/* Feature 5: Emergency Priority Toggle */}
+        <section className="card-brutal p-6 transition-colors">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className={`w-10 h-10 rounded-sm border-2 border-border flex items-center justify-center shadow-brutal-sm transition-colors ${isEmergency ? 'bg-red-500 text-white' : 'bg-surface text-muted'}`}>
+                <Zap size={20} />
+              </div>
+              <div>
+                <p className="font-heading font-bold text-text uppercase tracking-wider text-sm">Emergency Refill</p>
+                <p className="text-xs text-muted font-body">Skip the queue • Priority dispatch</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setIsEmergency(!isEmergency)}
+              className={`relative w-14 h-7 rounded-full border-2 border-border transition-colors ${isEmergency ? 'bg-red-500' : 'bg-bg'}`}
+            >
+              <motion.div
+                animate={{ x: isEmergency ? 26 : 2 }}
+                transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                className={`absolute top-0.5 w-5 h-5 rounded-full border-2 border-border shadow-sm ${isEmergency ? 'bg-white' : 'bg-muted'}`}
+              />
+            </button>
+          </div>
+          <AnimatePresence>
+            {isEmergency && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                className="overflow-hidden"
+              >
+                <div className="mt-4 p-3 bg-red-500/10 border-2 border-red-500/30 rounded-sm">
+                  <p className="text-xs font-heading font-bold text-red-500 uppercase tracking-wider flex items-center">
+                    <Zap size={12} className="mr-1" /> +₹150 Emergency Surge Fee
+                  </p>
+                  <p className="text-[10px] text-muted font-body mt-1">Your order will be prioritized to the nearest available captain.</p>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </section>
+
+        {/* Feature 4: Delivery Instructions */}
+        <section className="card-brutal p-6 transition-colors">
+          <div className="flex items-center space-x-3 mb-4">
+            <MessageSquareText size={18} className="text-primary" />
+            <h2 className="label-small">Delivery Instructions <span className="text-muted font-normal normal-case">(optional)</span></h2>
+          </div>
+          <textarea
+            value={deliveryInstructions}
+            onChange={(e) => setDeliveryInstructions(e.target.value)}
+            placeholder="e.g., Park near Pillar 4B, call from security gate..."
+            className="input-brutal w-full h-20 resize-none text-sm"
+            maxLength={200}
+          />
+          <p className="text-[10px] text-muted font-body mt-1 text-right">{deliveryInstructions.length}/200</p>
+        </section>
+
+        {/* Action Buttons */}
         <div className="pb-8 space-y-3">
           {vehicles.length > 1 && (
             <button
@@ -382,7 +461,7 @@ export default function OrderFuel() {
         </div>
       </main>
 
-      {/* Floating Cart (Feature 3) */}
+      {/* Floating Cart */}
       <FuelCart />
     </div>
   );

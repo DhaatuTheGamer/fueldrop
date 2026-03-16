@@ -1,7 +1,7 @@
 {
   "name": "fueldrop",
   "private": true,
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "A modern web application to order fuel directly to your doorstep.",
   "type": "module",
   "author": "Dhaatrik Chowdhury",

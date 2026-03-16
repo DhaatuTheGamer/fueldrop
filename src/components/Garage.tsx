@@ -18,6 +18,8 @@ const vehicleSchema = z.object({
   make: z.string().min(1, 'Make is required').max(30, 'Too long'),
   model: z.string().min(1, 'Model is required').max(30, 'Too long'),
   licensePlate: z.string().min(9, 'Enter a complete license plate (e.g., KA 01 AB 1234)'),
+  tankCapacity: z.number().min(1).max(200).optional(),
+  avgDailyKm: z.number().min(1).max(500).optional(),
 });
 
 type VehicleFormData = z.infer<typeof vehicleSchema>;
@@ -48,6 +50,8 @@ export default function Garage() {
       make: '',
       model: '',
       licensePlate: '',
+      tankCapacity: undefined,
+      avgDailyKm: undefined,
     },
   });
 
@@ -84,6 +88,8 @@ export default function Garage() {
       make: vehicle.make,
       model: vehicle.model,
       licensePlate: vehicle.licensePlate,
+      tankCapacity: vehicle.tankCapacity,
+      avgDailyKm: vehicle.avgDailyKm,
     });
     setEditingId(vehicle.id);
     setIsAdding(true);
@@ -195,6 +201,34 @@ export default function Garage() {
                   )}
                 </div>
 
+                {/* Feature 6: Tank Capacity & Daily Run */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="label-small">Tank Capacity (L) <span className="text-muted font-normal">(optional)</span></label>
+                    <input
+                      type="number"
+                      {...register('tankCapacity', { valueAsNumber: true })}
+                      className={`input-brutal ${errors.tankCapacity ? 'border-red-500' : ''}`}
+                      placeholder="e.g., 45"
+                    />
+                    {errors.tankCapacity && (
+                      <p className="text-red-500 text-xs font-body mt-1">{errors.tankCapacity.message}</p>
+                    )}
+                  </div>
+                  <div>
+                    <label className="label-small">Avg Daily Km <span className="text-muted font-normal">(optional)</span></label>
+                    <input
+                      type="number"
+                      {...register('avgDailyKm', { valueAsNumber: true })}
+                      className={`input-brutal ${errors.avgDailyKm ? 'border-red-500' : ''}`}
+                      placeholder="e.g., 30"
+                    />
+                    {errors.avgDailyKm && (
+                      <p className="text-red-500 text-xs font-body mt-1">{errors.avgDailyKm.message}</p>
+                    )}
+                  </div>
+                </div>
+
                 <button
                   type="submit"
                   className="btn-primary w-full py-4 mt-6"
@@ -248,6 +282,9 @@ export default function Garage() {
                             {vehicle.licensePlate}
                           </span>
                           <span className="uppercase tracking-wider text-xs font-bold">• {vehicle.fuelType}</span>
+                          {vehicle.tankCapacity && (
+                            <span className="uppercase tracking-wider text-xs font-bold">• {vehicle.tankCapacity}L tank</span>
+                          )}
                         </div>
                       </div>
                     </div>

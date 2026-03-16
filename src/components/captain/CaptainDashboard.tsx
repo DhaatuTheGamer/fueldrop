@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Truck, MapPin, Fuel, Clock, CheckCircle2, XCircle, DollarSign,
-  Star, ChevronRight, Shield, User, Phone, Navigation, Package
+  Star, ChevronRight, Shield, User, Phone, Navigation, Package, Zap, MessageSquareText, ExternalLink
 } from 'lucide-react';
 import { Order, OrderStatus } from '../../types';
 import { getActiveOrders, onOrderChange, updateOrderStatus, removeOrder } from '../../services/orderBridge';
@@ -265,6 +265,23 @@ export default function CaptainDashboard() {
                   <DollarSign size={16} className="text-muted shrink-0" />
                   <span className="font-heading font-bold text-primary">₹{(activeOrder.totalAmount || 0).toFixed(2)}</span>
                 </div>
+                {/* Feature 5: Emergency badge on incoming order */}
+                {activeOrder.isEmergency && (
+                  <div className="flex items-center space-x-2 text-sm bg-red-500/10 border-2 border-red-500/30 rounded-sm p-2">
+                    <Zap size={16} className="text-red-500 shrink-0" />
+                    <span className="font-heading font-bold text-red-500 uppercase tracking-wider text-xs">⚡ Emergency Priority</span>
+                  </div>
+                )}
+                {/* Feature 4: Delivery instructions on incoming order */}
+                {activeOrder.deliveryInstructions && (
+                  <div className="flex items-start space-x-3 text-sm bg-bg border-2 border-border rounded-sm p-2">
+                    <MessageSquareText size={16} className="text-primary shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-heading font-bold text-[10px] uppercase tracking-wider text-primary">Instructions</p>
+                      <p className="text-xs text-muted font-body">{activeOrder.deliveryInstructions}</p>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="flex space-x-3">
@@ -314,6 +331,23 @@ export default function CaptainDashboard() {
                     <span className="text-muted">Earnings</span>
                     <span className="text-primary font-heading font-bold">₹{((activeOrder.totalAmount || 0) * 0.12).toFixed(0)}</span>
                   </div>
+                  {/* Feature 5: Emergency indicator in active order */}
+                  {activeOrder.isEmergency && (
+                    <div className="flex items-center space-x-2 bg-red-500/10 border-2 border-red-500/30 rounded-sm p-2 mt-1">
+                      <Zap size={14} className="text-red-500" />
+                      <span className="font-heading font-bold text-red-500 text-xs uppercase tracking-wider">Emergency Priority</span>
+                    </div>
+                  )}
+                  {/* Feature 4: Delivery instructions in active order */}
+                  {activeOrder.deliveryInstructions && (
+                    <div className="flex items-start space-x-2 bg-bg border-2 border-border rounded-sm p-2 mt-1">
+                      <MessageSquareText size={14} className="text-primary shrink-0 mt-0.5" />
+                      <div>
+                        <p className="font-heading font-bold text-[10px] uppercase tracking-wider text-primary">Instructions</p>
+                        <p className="text-xs text-muted font-body">{activeOrder.deliveryInstructions}</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -393,19 +427,40 @@ export default function CaptainDashboard() {
 
               {/* Contact Customer */}
               {status !== 'completed' && (
-                <div className="card-brutal p-4 flex items-center justify-between transition-colors">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-surface border-2 border-border rounded-sm flex items-center justify-center">
-                      <User size={18} className="text-primary" />
+                <div className="space-y-3">
+                  <div className="card-brutal p-4 flex items-center justify-between transition-colors">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-surface border-2 border-border rounded-sm flex items-center justify-center">
+                        <User size={18} className="text-primary" />
+                      </div>
+                      <div>
+                        <p className="font-heading font-bold text-text text-sm uppercase tracking-wider">Customer</p>
+                        <p className="text-xs text-muted font-body">+91 XXXX XXXXX</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-heading font-bold text-text text-sm uppercase tracking-wider">Customer</p>
-                      <p className="text-xs text-muted font-body">+91 XXXX XXXXX</p>
-                    </div>
+                    <button className="w-10 h-10 bg-accent border-2 border-border rounded-sm flex items-center justify-center text-bg shadow-brutal-sm">
+                      <Phone size={18} />
+                    </button>
                   </div>
-                  <button className="w-10 h-10 bg-accent border-2 border-border rounded-sm flex items-center justify-center text-bg shadow-brutal-sm">
-                    <Phone size={18} />
-                  </button>
+
+                  {/* Feature 3: Navigate in Maps button */}
+                  {activeOrder.location && (status === 'accepted' || status === 'pickup' || status === 'transit') && (
+                    <button
+                      onClick={() => window.open(`https://maps.google.com/?daddr=${activeOrder.location.lat},${activeOrder.location.lng}`, '_blank')}
+                      className="card-brutal p-4 flex items-center justify-between transition-colors w-full hover:border-primary group"
+                    >
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 bg-accent/20 border-2 border-accent rounded-sm flex items-center justify-center group-hover:bg-accent group-hover:text-bg transition-colors">
+                          <Navigation size={18} className="text-accent group-hover:text-bg" />
+                        </div>
+                        <div className="text-left">
+                          <p className="font-heading font-bold text-text text-sm uppercase tracking-wider">Navigate in Maps</p>
+                          <p className="text-xs text-muted font-body">Open Google Maps for directions</p>
+                        </div>
+                      </div>
+                      <ExternalLink size={16} className="text-muted group-hover:text-primary" />
+                    </button>
+                  )}
                 </div>
               )}
 
