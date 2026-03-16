@@ -7,9 +7,10 @@ import { Order } from '../types';
 import SafetyChecklist from './SafetyChecklist';
 import { useDynamicPricing } from '../hooks/useDynamicPricing';
 import { useFocusTrap } from '../hooks/useFocusTrap';
+import { publishOrder } from '../services/orderBridge';
 
 export default function Checkout() {
-  const { currentOrder, setOrders, orders, addNotification, favoriteOrders, setFavoriteOrders, cart, setCart, vehicles } = useAppContext();
+  const { currentOrder, setCurrentOrder, setOrders, orders, addNotification, favoriteOrders, setFavoriteOrders, cart, setCart, vehicles } = useAppContext();
   const navigate = useNavigate();
   const [paymentMethod, setPaymentMethod] = useState('upi');
   const [promoCode, setPromoCode] = useState('');
@@ -71,6 +72,8 @@ export default function Checkout() {
   };
 
   const confirmOrder = () => {
+    const mainVehicle = vehicles.find(v => v.id === currentOrder.vehicleId);
+    
     const newOrder: Order = {
       ...currentOrder,
       id: `ord-${Date.now()}`,
@@ -79,9 +82,14 @@ export default function Checkout() {
       date: new Date().toISOString(),
       paymentMethod,
       totalAmount: total,
+      vehicleMake: mainVehicle?.make,
+      vehicleModel: mainVehicle?.model,
+      licensePlate: mainVehicle?.licensePlate,
     } as Order;
 
     setOrders([newOrder, ...orders]);
+    setCurrentOrder(newOrder);
+    publishOrder(newOrder);
 
     if (saveAsFavorite && favoriteName) {
       setFavoriteOrders([

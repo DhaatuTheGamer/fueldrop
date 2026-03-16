@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Phone, MessageSquare, CheckCircle2, Clock, Truck, AlertTriangle, X, Headphones, MapPin, Ban, PhoneCall } from 'lucide-react';
+import { Phone, MessageSquare, CheckCircle2, Clock, Truck, AlertTriangle, X, Headphones, MapPin, Ban, PhoneCall, RefreshCw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import { OrderStatus } from '../types';
+import { getActiveOrders, onOrderChange, updateOrderStatus as bridgeUpdateStatus } from '../services/orderBridge';
 
 const statuses: OrderStatus[] = ['Pending', 'Accepted', 'Out for Delivery', 'Arriving', 'Delivered'];
 
@@ -15,52 +16,67 @@ const SUPPORT_OPTIONS = [
 ];
 
 export default function LiveTracking() {
-  const { addNotification } = useAppContext();
+  const { addNotification, currentOrder, updateOrderStatus } = useAppContext();
   const navigate = useNavigate();
-  const [statusIndex, setStatusIndex] = useState(0);
+  
+  // Derive current status from context directly to avoid stale closures
+  const currentStatus = currentOrder?.status || 'Pending';
+  const [captainName, setCaptainName] = useState<string | null>(null);
+  
   const [eta, setEta] = useState(12 * 60);
   const [showSOS, setShowSOS] = useState(false);
 
+  // Sync with order bridge
   useEffect(() => {
+    if (!currentOrder?.id) return;
+
+    const handleOrders = (orders: any[]) => {
+      const active = orders.find(o => o.id === currentOrder.id);
+      if (active) {
+        // If the bridge has a newer status than what we know about
+        if (active.status !== currentStatus) {
+          updateOrderStatus(active.id, active.status, { captainName: active.captainName }); // Update context
+          
+          if (active.status === 'Accepted') {
+            addNotification('Order Confirmed', `${active.captainName || 'A captain'} has accepted your order.`, 'success');
+          } else if (active.status === 'Out for Delivery') {
+            addNotification('Out for Delivery', 'Your captain is on the way with your fuel.', 'info');
+          } else if (active.status === 'Delivered') {
+            addNotification('Order Delivered', 'Your fuel has been delivered successfully!', 'success');
+          } else if (active.status === 'Cancelled') {
+            addNotification('Order Cancelled', 'No captain available, please try again later.', 'warning');
+          }
+        }
+        if (active.captainName) setCaptainName(active.captainName);
+      }
+    };
+
+    // Initial check
+    handleOrders(getActiveOrders());
+
+    // Subscribe to changes
+    return onOrderChange(handleOrders);
+  }, [currentOrder?.id, currentStatus, addNotification, updateOrderStatus]);
+
+  // ETA countdown
+  useEffect(() => {
+    if (currentStatus === 'Delivered' || currentStatus === 'Cancelled') return;
+    
     const timer = setInterval(() => {
       setEta((prev) => (prev > 0 ? prev - 1 : 0));
     }, 1000);
     return () => clearInterval(timer);
-  }, []);
+  }, [currentStatus]);
 
+  // Auto-navigate on delivery
   useEffect(() => {
-    const interval = setInterval(() => {
-      setStatusIndex((prev) => {
-        if (prev < statuses.length - 1) {
-          return prev + 1;
-        }
-        clearInterval(interval);
-        return prev;
-      });
-    }, 800);
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    const currentStatus = statuses[statusIndex];
-    if (currentStatus === 'Accepted') {
-      addNotification('Order Confirmed', 'Your fuel order has been accepted and a captain is assigned.', 'success');
-    } else if (currentStatus === 'Out for Delivery') {
-      addNotification('Out for Delivery', 'Your captain is on the way with your fuel.', 'info');
-    } else if (currentStatus === 'Delivered') {
-      addNotification('Order Delivered', 'Your fuel has been delivered successfully!', 'success');
-    }
-  }, [statusIndex, addNotification]);
-
-  useEffect(() => {
-    if (statusIndex === statuses.length - 1) {
-      setTimeout(() => {
+    if (currentStatus === 'Delivered') {
+      const timer = setTimeout(() => {
         navigate('/rating');
-      }, 1500);
+      }, 2500);
+      return () => clearTimeout(timer);
     }
-  }, [statusIndex, navigate]);
-
-  const currentStatus = statuses[statusIndex];
+  }, [currentStatus, navigate]);
 
   const handleSupportOption = (id: string) => {
     setShowSOS(false);
@@ -72,6 +88,9 @@ export default function LiveTracking() {
         addNotification('Support Notified', 'We\'re checking with your captain. Please wait.', 'info');
         break;
       case 'cancel':
+        if (currentOrder?.id) {
+          bridgeUpdateStatus(currentOrder.id, 'Cancelled');
+        }
         addNotification('Cancellation Request', 'Your cancellation request has been submitted.', 'warning');
         break;
       case 'call':
@@ -79,6 +98,40 @@ export default function LiveTracking() {
         break;
     }
   };
+
+  useEffect(() => {
+    if (!currentOrder) {
+      navigate('/');
+    }
+  }, [currentOrder, navigate]);
+
+  if (!currentOrder) {
+    return null;
+  }
+
+  // Handle cancelled state specially
+  if (currentStatus === 'Cancelled') {
+    return (
+      <div className="min-h-screen bg-bg flex flex-col items-center justify-center p-6 text-center">
+        <div className="w-20 h-20 bg-surface border-2 border-border rounded-sm flex items-center justify-center mb-6 shadow-brutal text-muted">
+          <Ban size={40} />
+        </div>
+        <h2 className="text-2xl font-heading font-bold text-text uppercase tracking-wider mb-2">Order Cancelled</h2>
+        <p className="text-muted font-body mb-8">
+          No captain available. Please try again later or check your network connection.
+        </p>
+        <button 
+          onClick={() => navigate('/order')} 
+          className="btn-primary px-8 py-4 text-lg flex items-center shadow-brutal"
+        >
+          <RefreshCw size={20} className="mr-2" /> Try Again
+        </button>
+      </div>
+    );
+  }
+
+  const statusIndex = statuses.indexOf(currentStatus);
+  const isPending = currentStatus === 'Pending';
 
   return (
     <div className="min-h-screen bg-bg flex flex-col transition-colors">
@@ -91,32 +144,38 @@ export default function LiveTracking() {
           }} />
           
           {/* Route Line */}
-          <svg className="absolute w-full h-full" style={{ filter: 'drop-shadow(4px 4px 0px rgba(229, 107, 37, 0.2))' }}>
-            <path 
-              d="M 100,100 C 150,200 250,150 300,300" 
-              fill="none" 
-              stroke="#E56B25" 
-              strokeWidth="4" 
-              strokeDasharray="8 8"
-              className="animate-[dash_20s_linear_infinite]"
-            />
-          </svg>
+          {!isPending && currentStatus !== 'Delivered' && (
+            <svg className="absolute w-full h-full" style={{ filter: 'drop-shadow(4px 4px 0px rgba(229, 107, 37, 0.2))' }}>
+              <path 
+                d="M 100,100 C 150,200 250,150 300,300" 
+                fill="none" 
+                stroke="#E56B25" 
+                strokeWidth="4" 
+                strokeDasharray="8 8"
+                className="animate-[dash_20s_linear_infinite]"
+              />
+            </svg>
+          )}
 
           {/* Delivery Vehicle Marker */}
-          <motion.div 
-            className="absolute w-12 h-12 bg-bg rounded-sm shadow-brutal flex items-center justify-center border-2 border-border z-10"
-            animate={{ 
-              x: [0, 50, 150, 200],
-              y: [0, 100, 50, 200]
-            }}
-            transition={{ duration: 16, ease: "linear" }}
-          >
-            <Truck size={20} className="text-primary" />
-          </motion.div>
+          {!isPending && currentStatus !== 'Delivered' && (
+            <motion.div 
+              className="absolute w-12 h-12 bg-bg rounded-sm shadow-brutal flex items-center justify-center border-2 border-border z-10"
+              animate={{ 
+                x: [0, 50, 150, 200],
+                y: [0, 100, 50, 200]
+              }}
+              transition={{ duration: 16, ease: "linear" }}
+            >
+              <Truck size={20} className="text-primary" />
+            </motion.div>
+          )}
 
           {/* Destination Marker */}
           <div className="absolute top-[300px] left-[300px] -translate-x-1/2 -translate-y-1/2">
-            <div className="w-16 h-16 bg-primary/20 rounded-full animate-ping absolute inset-0" />
+            {!isPending && currentStatus !== 'Delivered' && (
+              <div className="w-16 h-16 bg-primary/20 rounded-full animate-ping absolute inset-0" />
+            )}
             <div className="w-8 h-8 bg-primary rounded-sm border-2 border-border shadow-brutal relative z-10 flex items-center justify-center">
               <div className="w-2 h-2 bg-bg rounded-sm" />
             </div>
@@ -124,17 +183,17 @@ export default function LiveTracking() {
         </div>
 
         {/* Header Overlay */}
-        <div className="absolute top-0 left-0 right-0 p-6 bg-gradient-to-b from-bg/80 to-transparent">
+        <div className="absolute top-0 left-0 right-0 p-6 bg-linear-to-b from-bg/80 to-transparent">
           <div className="bg-bg/90 backdrop-blur-md rounded-sm p-4 shadow-brutal flex items-center justify-between border-2 border-border">
             <div>
               <p className="label-small">Estimated Arrival</p>
               <p className="text-2xl font-heading font-bold text-text">
-                {Math.floor(eta / 60)}:{String(eta % 60).padStart(2, '0')}
+                {isPending ? '--:--' : `${Math.floor(eta / 60)}:${String(eta % 60).padStart(2, '0')}`}
               </p>
             </div>
             <div className="text-right">
               <p className="label-small">Distance</p>
-              <p className="text-lg font-heading font-bold text-text">2.4 km</p>
+              <p className="text-lg font-heading font-bold text-text">{isPending ? '--' : '2.4 km'}</p>
             </div>
           </div>
         </div>
@@ -146,11 +205,14 @@ export default function LiveTracking() {
         <div className="px-6 pb-8">
           {/* Status Tracker */}
           <div className="mb-8">
-            <h2 className="text-xl font-heading font-bold text-text uppercase tracking-wider mb-6">{currentStatus}</h2>
+            <h2 className="text-xl font-heading font-bold text-text uppercase tracking-wider mb-6">
+              {currentStatus === 'Pending' ? 'Finding a Captain...' : currentStatus}
+            </h2>
             <div className="relative">
               <div className="absolute left-[15px] top-2 bottom-2 w-0.5 bg-border" />
               <div className="space-y-6 relative">
                 {statuses.map((status, index) => {
+                  // We treat index matching as the active step
                   const isCompleted = index <= statusIndex;
                   const isCurrent = index === statusIndex;
                   
@@ -168,19 +230,22 @@ export default function LiveTracking() {
                         }`}>
                           {status}
                         </p>
-                        {isCurrent && (
-                          <motion.p 
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 'auto' }}
-                            className="text-sm text-muted font-body mt-1"
-                          >
-                            {status === 'Pending' && 'Waiting for captain to accept...'}
-                            {status === 'Accepted' && 'Captain is heading to the fuel station.'}
-                            {status === 'Out for Delivery' && 'Captain is on the way to your location.'}
-                            {status === 'Arriving' && 'Captain is arriving in a minute.'}
-                            {status === 'Delivered' && 'Fuel delivered successfully!'}
-                          </motion.p>
-                        )}
+                        <AnimatePresence>
+                          {isCurrent && (
+                            <motion.p 
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: 'auto' }}
+                              exit={{ opacity: 0, height: 0 }}
+                              className="text-sm text-muted font-body mt-1"
+                            >
+                              {status === 'Pending' && 'Waiting for captain to accept...'}
+                              {status === 'Accepted' && 'Captain is heading to the fuel station.'}
+                              {status === 'Out for Delivery' && 'Captain is on the way to your location.'}
+                              {status === 'Arriving' && 'Captain is arriving in a minute.'}
+                              {status === 'Delivered' && 'Fuel delivered successfully!'}
+                            </motion.p>
+                          )}
+                        </AnimatePresence>
                       </div>
                     </div>
                   );
@@ -189,28 +254,36 @@ export default function LiveTracking() {
             </div>
           </div>
 
-          {/* Captain Info */}
-          <div className="card-brutal p-4 flex items-center justify-between transition-colors">
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-surface border-2 border-border rounded-sm flex items-center justify-center overflow-hidden">
-                <img src="https://i.pravatar.cc/150?img=11" alt="Captain" className="w-full h-full object-cover grayscale" />
-              </div>
-              <div>
-                <p className="font-heading font-bold text-text uppercase tracking-wider">Rahul Kumar</p>
-                <p className="text-sm text-muted font-body flex items-center">
-                  <span className="text-primary mr-1">★</span> 4.8 (120+ deliveries)
-                </p>
-              </div>
-            </div>
-            <div className="flex space-x-2">
-              <button className="w-10 h-10 bg-surface border-2 border-border rounded-sm flex items-center justify-center text-text shadow-brutal-sm hover:bg-bg transition-colors">
-                <MessageSquare size={18} />
-              </button>
-              <button className="w-10 h-10 bg-primary border-2 border-border rounded-sm flex items-center justify-center text-bg shadow-brutal-sm hover:bg-opacity-90 transition-colors">
-                <Phone size={18} />
-              </button>
-            </div>
-          </div>
+          {/* Captain Info (only row if accepted or later) */}
+          <AnimatePresence>
+            {!isPending && (
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="card-brutal p-4 flex items-center justify-between transition-colors mt-4"
+              >
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 bg-surface border-2 border-border rounded-sm flex items-center justify-center overflow-hidden">
+                    <img src="https://i.pravatar.cc/150?img=11" alt="Captain" className="w-full h-full object-cover grayscale" />
+                  </div>
+                  <div>
+                    <p className="font-heading font-bold text-text uppercase tracking-wider">{captainName || 'Captain'}</p>
+                    <p className="text-sm text-muted font-body flex items-center">
+                      <span className="text-primary mr-1">★</span> 4.8 (120+ deliveries)
+                    </p>
+                  </div>
+                </div>
+                <div className="flex space-x-2">
+                  <button className="w-10 h-10 bg-surface border-2 border-border rounded-sm flex items-center justify-center text-text shadow-brutal-sm hover:bg-bg transition-colors">
+                    <MessageSquare size={18} />
+                  </button>
+                  <button className="w-10 h-10 bg-primary border-2 border-border rounded-sm flex items-center justify-center text-bg shadow-brutal-sm hover:bg-opacity-90 transition-colors">
+                    <Phone size={18} />
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
 
@@ -222,7 +295,7 @@ export default function LiveTracking() {
           onClick={() => setShowSOS(true)}
           className="fixed bottom-6 right-6 z-40 w-14 h-14 bg-red-500 border-2 border-border rounded-sm shadow-brutal flex items-center justify-center text-white hover:translate-y-[2px] hover:translate-x-[2px] hover:shadow-brutal-sm transition-all"
         >
-          <AlertTriangle size={22} className="animate-pulse" />
+          <AlertTriangle size={22} className={isPending ? "animate-pulse" : ""} />
         </motion.button>
       )}
 

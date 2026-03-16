@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback, useMemo } from 'react';
-import { User, Vehicle, Order, Location, FavoriteOrder, AppNotification, CartItem, SavedAddress } from '../types';
+import { User, Vehicle, Order, Location, FavoriteOrder, AppNotification, CartItem, SavedAddress, OrderStatus } from '../types';
 import { usePersistedState, clearPersistedState } from '../hooks/usePersistedState';
 
 const PERSISTED_KEYS = ['fd_user', 'fd_vehicles', 'fd_orders', 'fd_favorites', 'fd_darkMode', 'fd_onboarding', 'fd_savedAddresses'];
@@ -28,6 +28,7 @@ interface AppContextType {
   setCart: React.Dispatch<React.SetStateAction<CartItem[]>>;
   savedAddresses: SavedAddress[];
   setSavedAddresses: (addresses: SavedAddress[]) => void;
+  updateOrderStatus: (orderId: string, status: OrderStatus, extra?: Partial<Order>) => void;
   logout: () => void;
 }
 
@@ -89,6 +90,11 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     return () => timers.forEach(clearTimeout);
   }, [notifications, markNotificationRead]);
 
+  const updateOrderStatus = useCallback((orderId: string, status: OrderStatus, extra?: Partial<Order>) => {
+    setOrders((prev: Order[]) => prev.map(o => o.id === orderId ? { ...o, status, ...extra } : o));
+    setCurrentOrder(prev => (prev?.id === orderId) ? { ...prev, status, ...extra } : prev);
+  }, [setOrders]);
+
   const logout = () => {
     clearPersistedState(PERSISTED_KEYS);
     setUser(null);
@@ -127,13 +133,14 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     setCart,
     savedAddresses,
     setSavedAddresses,
+    updateOrderStatus,
     logout,
   }), [
     user, setUser, vehicles, setVehicles, orders, setOrders,
     currentOrder, location, favoriteOrders, setFavoriteOrders,
     notifications, addNotification, markNotificationRead,
     darkMode, setDarkMode, hasCompletedOnboarding, setHasCompletedOnboarding,
-    cart, savedAddresses, setSavedAddresses, logout
+    cart, savedAddresses, setSavedAddresses, updateOrderStatus, logout
   ]);
 
   return (

@@ -4,30 +4,8 @@ import {
   Truck, MapPin, Fuel, Clock, CheckCircle2, XCircle, DollarSign,
   Star, ChevronRight, Shield, User, Phone, Navigation, Package
 } from 'lucide-react';
-
-interface MockOrder {
-  id: string;
-  customerName: string;
-  customerPhone: string;
-  fuelType: 'Petrol' | 'Diesel';
-  quantityLiters: number;
-  totalAmount: number;
-  address: string;
-  distance: string;
-  vehicleInfo: string;
-}
-
-const MOCK_INCOMING_ORDER: MockOrder = {
-  id: 'ORD-7829',
-  customerName: 'Arjun Mehta',
-  customerPhone: '+91 98765 43210',
-  fuelType: 'Petrol',
-  quantityLiters: 15,
-  totalAmount: 1822.5,
-  address: '14, Indiranagar 3rd Stage, Bangalore - 560038',
-  distance: '3.2 km',
-  vehicleInfo: 'Hyundai i20 (KA 01 AB 1234)',
-};
+import { Order, OrderStatus } from '../../types';
+import { getActiveOrders, onOrderChange, updateOrderStatus, removeOrder } from '../../services/orderBridge';
 
 const SAFETY_ITEMS = [
   'Wear safety gloves before handling fuel',
@@ -44,23 +22,84 @@ export default function CaptainDashboard() {
   const [checklist, setChecklist] = useState<boolean[]>(new Array(SAFETY_ITEMS.length).fill(false));
   const [earnings] = useState({ today: 1240, trips: 5, rating: 4.9 });
   const allChecked = checklist.every(Boolean);
+  
+  const [activeOrder, setActiveOrder] = useState<Order | null>(null);
 
-  // Simulate incoming order when available
+  // Sync orders from bridge
   useEffect(() => {
-    if (status === 'available') {
-      const timer = setTimeout(() => setStatus('incoming'), 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [status]);
+    const handleOrders = (orders: Order[]) => {
+      // Find the first pending order if we're available, or our current active order
+      const pending = orders.find(o => o.status === 'Pending');
+      
+      if (status === 'available' && pending && !activeOrder) {
+        setActiveOrder(pending);
+        setStatus('incoming');
+      } else if (activeOrder) {
+        // Update our active order reference if it changed in the bridge
+        const updated = orders.find(o => o.id === activeOrder.id);
+        if (updated) {
+          setActiveOrder(updated);
+          // If the order was cancelled by user (or somewhere else), reset
+          if (updated.status === 'Cancelled') {
+            setActiveOrder(null);
+            setStatus('available');
+            setChecklist(new Array(SAFETY_ITEMS.length).fill(false));
+          }
+        }
+      }
+    };
 
-  const handleAccept = () => setStatus('accepted');
-  const handleDecline = () => setStatus('available');
-  const handleStartPickup = () => setStatus('pickup');
-  const handlePickedUp = () => setStatus('transit');
-  const handleArrived = () => setStatus('arrived');
-  const handleStartFueling = () => setStatus('fueling');
-  const handleComplete = () => setStatus('completed');
-  const handleNewOrder = () => { setStatus('available'); setChecklist(new Array(SAFETY_ITEMS.length).fill(false)); };
+    // Initial load
+    handleOrders(getActiveOrders());
+
+    // Subscribe to changes
+    return onOrderChange(handleOrders);
+  }, [status, activeOrder]);
+
+  const handleAccept = () => {
+    if (!activeOrder) return;
+    setStatus('accepted');
+    updateOrderStatus(activeOrder.id, 'Accepted', 'Rahul Kumar');
+  };
+
+  const handleDecline = () => {
+    if (!activeOrder) return;
+    // We treat declining as cancelling the order so the user sees it
+    updateOrderStatus(activeOrder.id, 'Cancelled');
+    setActiveOrder(null);
+    setStatus('available');
+  };
+
+  const handleStartPickup = () => setStatus('pickup'); // Internal step, no status change in DB yet
+  
+  const handlePickedUp = () => {
+    if (!activeOrder) return;
+    setStatus('transit');
+    updateOrderStatus(activeOrder.id, 'Out for Delivery');
+  };
+  
+  const handleArrived = () => {
+    if (!activeOrder) return;
+    setStatus('arrived');
+    updateOrderStatus(activeOrder.id, 'Arriving');
+  };
+  
+  const handleStartFueling = () => setStatus('fueling'); // Internal step
+  
+  const handleComplete = () => {
+    if (!activeOrder) return;
+    setStatus('completed');
+    updateOrderStatus(activeOrder.id, 'Delivered');
+  };
+  
+  const handleNewOrder = () => {
+    if (activeOrder) {
+      removeOrder(activeOrder.id);
+    }
+    setActiveOrder(null);
+    setStatus('available'); 
+    setChecklist(new Array(SAFETY_ITEMS.length).fill(false)); 
+  };
 
   const statusColors: Record<string, string> = {
     offline: 'bg-muted',
@@ -73,6 +112,10 @@ export default function CaptainDashboard() {
     fueling: 'bg-primary',
     completed: 'bg-accent',
   };
+
+  const displayVehicle = activeOrder?.vehicleMake 
+    ? `${activeOrder.vehicleMake} ${activeOrder.vehicleModel || ''} (${activeOrder.licensePlate || 'Unknown'})`
+    : 'Vehicle not specified';
 
   return (
     <div className="min-h-screen bg-bg flex flex-col transition-colors">
@@ -186,7 +229,7 @@ export default function CaptainDashboard() {
           )}
 
           {/* Incoming Order */}
-          {status === 'incoming' && (
+          {status === 'incoming' && activeOrder && (
             <motion.div
               key="incoming"
               initial={{ opacity: 0, scale: 0.95 }}
@@ -199,28 +242,28 @@ export default function CaptainDashboard() {
                   New Order Request!
                 </h3>
                 <span className="text-xs font-heading font-bold bg-primary text-bg px-2 py-1 rounded-sm border-2 border-border">
-                  {MOCK_INCOMING_ORDER.distance}
+                  2.4 km
                 </span>
               </div>
 
               <div className="space-y-3 mb-6">
                 <div className="flex items-center space-x-3 text-sm">
                   <User size={16} className="text-muted shrink-0" />
-                  <span className="text-text font-body">{MOCK_INCOMING_ORDER.customerName}</span>
+                  <span className="text-text font-body">Customer</span>
                 </div>
                 <div className="flex items-center space-x-3 text-sm">
                   <Fuel size={16} className="text-muted shrink-0" />
                   <span className="text-text font-body">
-                    {MOCK_INCOMING_ORDER.fuelType} • {MOCK_INCOMING_ORDER.quantityLiters}L
+                    {activeOrder.fuelType} • {activeOrder.quantityLiters?.toFixed(2) || 0}L
                   </span>
                 </div>
                 <div className="flex items-center space-x-3 text-sm">
                   <MapPin size={16} className="text-muted shrink-0" />
-                  <span className="text-text font-body line-clamp-2">{MOCK_INCOMING_ORDER.address}</span>
+                  <span className="text-text font-body line-clamp-2">{activeOrder.location.address}</span>
                 </div>
                 <div className="flex items-center space-x-3 text-sm">
                   <DollarSign size={16} className="text-muted shrink-0" />
-                  <span className="font-heading font-bold text-primary">₹{MOCK_INCOMING_ORDER.totalAmount}</span>
+                  <span className="font-heading font-bold text-primary">₹{(activeOrder.totalAmount || 0).toFixed(2)}</span>
                 </div>
               </div>
 
@@ -238,7 +281,7 @@ export default function CaptainDashboard() {
           )}
 
           {/* Active Order Flow */}
-          {['accepted', 'pickup', 'transit', 'arrived', 'fueling', 'completed'].includes(status) && (
+          {['accepted', 'pickup', 'transit', 'arrived', 'fueling', 'completed'].includes(status) && activeOrder && (
             <motion.div
               key="active"
               initial={{ opacity: 0, y: 20 }}
@@ -249,7 +292,7 @@ export default function CaptainDashboard() {
               {/* Order Details */}
               <div className="card-brutal p-5 transition-colors">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-heading font-bold text-text uppercase tracking-wider">Order {MOCK_INCOMING_ORDER.id}</h3>
+                  <h3 className="font-heading font-bold text-text uppercase tracking-wider">Order {activeOrder.id.slice(-4)}</h3>
                   <span className="text-xs font-heading font-bold bg-primary text-bg px-2 py-1 rounded-sm border-2 border-border uppercase">
                     {status}
                   </span>
@@ -257,19 +300,19 @@ export default function CaptainDashboard() {
                 <div className="space-y-2 text-sm font-body">
                   <div className="flex justify-between">
                     <span className="text-muted">Customer</span>
-                    <span className="text-text font-heading font-bold">{MOCK_INCOMING_ORDER.customerName}</span>
+                    <span className="text-text font-heading font-bold">Customer</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted">Vehicle</span>
-                    <span className="text-text font-heading font-bold text-xs uppercase">{MOCK_INCOMING_ORDER.vehicleInfo}</span>
+                    <span className="text-text font-heading font-bold text-xs uppercase text-right max-w-[150px]">{displayVehicle}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted">Fuel</span>
-                    <span className="text-text font-heading font-bold">{MOCK_INCOMING_ORDER.fuelType} • {MOCK_INCOMING_ORDER.quantityLiters}L</span>
+                    <span className="text-text font-heading font-bold">{activeOrder.fuelType} • {activeOrder.quantityLiters?.toFixed(2)}L</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted">Earnings</span>
-                    <span className="text-primary font-heading font-bold">₹{(MOCK_INCOMING_ORDER.totalAmount * 0.12).toFixed(0)}</span>
+                    <span className="text-primary font-heading font-bold">₹{((activeOrder.totalAmount || 0) * 0.12).toFixed(0)}</span>
                   </div>
                 </div>
               </div>
@@ -356,8 +399,8 @@ export default function CaptainDashboard() {
                       <User size={18} className="text-primary" />
                     </div>
                     <div>
-                      <p className="font-heading font-bold text-text text-sm uppercase tracking-wider">{MOCK_INCOMING_ORDER.customerName}</p>
-                      <p className="text-xs text-muted font-body">{MOCK_INCOMING_ORDER.customerPhone}</p>
+                      <p className="font-heading font-bold text-text text-sm uppercase tracking-wider">Customer</p>
+                      <p className="text-xs text-muted font-body">+91 XXXX XXXXX</p>
                     </div>
                   </div>
                   <button className="w-10 h-10 bg-accent border-2 border-border rounded-sm flex items-center justify-center text-bg shadow-brutal-sm">
@@ -404,7 +447,7 @@ export default function CaptainDashboard() {
                       <CheckCircle2 size={32} className="text-bg" />
                     </div>
                     <h3 className="font-heading font-bold text-xl text-text uppercase tracking-wider">Delivery Complete!</h3>
-                    <p className="text-muted font-body text-sm">You earned ₹{(MOCK_INCOMING_ORDER.totalAmount * 0.12).toFixed(0)} for this trip.</p>
+                    <p className="text-muted font-body text-sm">You earned ₹{((activeOrder.totalAmount || 0) * 0.12).toFixed(0)} for this trip.</p>
                     <button onClick={handleNewOrder} className="btn-primary px-8 py-3"
                       style={{ backgroundColor: 'var(--accent)', boxShadow: '4px 4px 0px var(--accent)' }}>
                       Accept New Orders

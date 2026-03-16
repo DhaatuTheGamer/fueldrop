@@ -41,6 +41,10 @@ export interface Order {
   tip?: number;
   isScheduled?: boolean;
   scheduledDate?: string;
+  captainName?: string;
+  vehicleMake?: string;
+  vehicleModel?: string;
+  licensePlate?: string;
 }
 
 export interface FavoriteOrder {
