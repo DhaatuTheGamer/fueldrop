@@ -22,6 +22,7 @@ FuelDrop is a cutting-edge, React-powered fuel delivery platform that redefines 
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
 - [Usage Guide](#-usage-guide)
+- [Captain Guide](#-captain-guide)
 - [Project Structure](#-project-structure)
 - [Contributing](#-contributing)
 - [Testing](#-testing)
@@ -37,6 +38,7 @@ FuelDrop is a cutting-edge, React-powered fuel delivery platform that redefines 
 - **📍 Real-time Tracking**: Live delivery status updates, captain assignment, and ETA tracking.
 - **📊 Order Insights**: Comprehensive history of past and ongoing deliveries with filters & search.
 - **❤️ Favorite Orders**: Save and quickly reorder your most common fuel deliveries.
+- **👨‍✈️ Captain Dashboard**: Dedicated interface for delivery partners to manage and fulfill orders.
 - **🌙 Dark Mode**: Full light/dark theme support with a neo-brutalist design system.
 - **⭐ Captain Rating**: Rate your delivery captain and leave tips after each order.
 - **📱 Mobile-First Design**: Fully responsive UI built for the modern mobile user.
@@ -87,24 +89,40 @@ FuelDrop is a cutting-edge, React-powered fuel delivery platform that redefines 
 
 ## 📖 Usage Guide
 
-### Refueling Workflow
+### User Journey: Refueling Made Simple
 
-To order fuel, follow these simple steps:
+Follow these steps to get fuel delivered to your doorstep:
 
-1. **Login**: Enter your mobile number and verify with OTP (`1234` for testing).
-2. **Add a Vehicle**: Go to the Garage and add your car or bike.
-3. **Select Vehicle & Set Amount**:
-   ```typescript
-   // Example of order state
-   const order = {
-     vehicleId: 'v123',
-     amount: 50, // Liters
-     type: 'volume'
-   };
-   ```
-4. **Checkout**: Review the price breakdown including delivery fees and GST.
-5. **Track**: Monitor your "Captain" as they make their way to your location.
-6. **Rate**: Provide feedback and an optional tip after delivery.
+1. **Secure Login**: Enter your mobile number and authenticate using the test OTP `1234`.
+2. **Add Your Fleet**: Navigate to the **Garage** to add your vehicles. FuelDrop supports multiple vehicle profiles.
+3. **Place an Order**: 
+    - Select a vehicle from your garage.
+    - Choose your fuel type (Petrol/Diesel/Power).
+    - Specify quantity by **Volume** (Liters) or **Value** (Rupees).
+4. **Instant Checkout**: Review the transparent pricing, including delivery fees and taxes.
+5. **Live Tracking**: Once a Captain accepts, track their real-time location and estimated arrival time on the map.
+6. **Completion & Feedback**: After delivery, rate your experience and leave a tip for your Captain.
+
+---
+
+## 👨‍✈️ Captain Guide
+
+### Fulfilling Orders
+
+The Captain App is a dedicated interface for our delivery partners to manage their workflow.
+
+**Accessing the Captain App:**
+Navigate to `http://localhost:3000/captain` to access the Captain Dashboard. This route is publicly accessible for testing and demonstration purposes.
+
+**Captain Workflow:**
+1.  **Dashboard Overview**: View available orders in your vicinity with details like fuel type, quantity, and distance.
+2.  **Accepting Orders**: Tap **"Accept Order"** to claim a delivery.
+3.  **Status Management**: Update the order status as you progress:
+    - **Pick Up**: Mark when you've reached the station.
+    - **In Transit**: Mark when you are on your way to the user.
+    - **Arrived**: Notify the user when you've reached the delivery location.
+4.  **Order Completion**: Finalize the delivery once the fuel is dispensed.
+5.  **Earnings Tracking**: (Coming Soon) Track your daily earnings and completed trips.
 
 ---
 
