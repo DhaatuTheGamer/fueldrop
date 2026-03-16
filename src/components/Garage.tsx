@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ArrowLeft, Car, Plus, Trash2, Edit2, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
-import { Vehicle, VehicleType, FuelType } from '../types';
+import { Vehicle } from '../types';
 import LicensePlateInput from './LicensePlateInput';
 import { SkeletonCard } from './SkeletonLoader';
 import { useFocusTrap } from '../hooks/useFocusTrap';

@@ -4,7 +4,7 @@ import {
   Truck, MapPin, Fuel, Clock, CheckCircle2, XCircle, DollarSign,
   Star, ChevronRight, Shield, User, Phone, Navigation, Package, Zap, MessageSquareText, ExternalLink
 } from 'lucide-react';
-import { Order, OrderStatus } from '../../types';
+import { Order } from '../../types';
 import { getActiveOrders, onOrderChange, updateOrderStatus, removeOrder } from '../../services/orderBridge';
 
 const SAFETY_ITEMS = [

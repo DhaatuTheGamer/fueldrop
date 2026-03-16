@@ -62,7 +62,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         return prev;
       }
       return [{
-        id: Date.now().toString() + Math.random().toString(36).substring(2, 9),
+        id: crypto.randomUUID(),
         title,
         message,
         type,
