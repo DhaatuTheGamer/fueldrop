@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="public/icon-192.png" width="128" alt="FuelDrop Logo" />
+  <img src="./public/icon-192.png" width="128" alt="FuelDrop Logo" />
 </p>
 
 # FuelDrop
