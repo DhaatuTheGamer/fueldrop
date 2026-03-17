@@ -55,14 +55,26 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [darkMode]);
 
+  const markNotificationRead = useCallback((id: string) => {
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+  }, []);
+
   const addNotification = useCallback((title: string, message: string, type: 'info' | 'success' | 'warning' = 'info') => {
+    const id = Date.now().toString() + Math.random().toString(36).substring(2, 9);
+
+    // Set auto-dismiss timer for this specific notification
+    setTimeout(() => {
+      markNotificationRead(id);
+    }, 5000);
+
     setNotifications(prev => {
       // Avoid duplicate notifications in quick succession
       if (prev.length > 0 && prev[0].title === title && prev[0].message === message) {
         return prev;
       }
+
       return [{
-        id: Date.now().toString() + Math.random().toString(36).substring(2, 9),
+        id,
         title,
         message,
         type,
@@ -70,25 +82,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         read: false
       }, ...prev];
     });
-  }, []);
-
-  const markNotificationRead = useCallback((id: string) => {
-    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
-  }, []);
-
-  // Auto-dismiss unread notifications after 5 seconds
-  useEffect(() => {
-    const unread = notifications.filter(n => !n.read);
-    if (unread.length === 0) return;
-
-    const timers = unread.map(n => {
-      return setTimeout(() => {
-        markNotificationRead(n.id);
-      }, 5000);
-    });
-
-    return () => timers.forEach(clearTimeout);
-  }, [notifications, markNotificationRead]);
+  }, [markNotificationRead]);
 
   const updateOrderStatus = useCallback((orderId: string, status: OrderStatus, extra?: Partial<Order>) => {
     setOrders((prev: Order[]) => prev.map(o => o.id === orderId ? { ...o, status, ...extra } : o));

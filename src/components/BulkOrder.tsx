@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowLeft, Car, Fuel, Plus, Trash2, ArrowRight, Users, MapPin } from 'lucide-react';
+import { ArrowLeft, Car, Fuel, Plus, Trash2, ArrowRight, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import { FuelType, Vehicle } from '../types';
@@ -17,6 +17,12 @@ export default function BulkOrder() {
   const { vehicles, location, setLocation, setCurrentOrder, setCart, addNotification } = useAppContext();
   const navigate = useNavigate();
   const [items, setItems] = useState<BulkItem[]>([]);
+
+  const vehicleMap = useMemo(() => {
+    const map = new Map<string, Vehicle>();
+    vehicles.forEach(v => map.set(v.id, v));
+    return map;
+  }, [vehicles]);
 
   const FUEL_PRICE: Record<FuelType, number> = {
     Petrol: 101.5,
@@ -117,7 +123,7 @@ export default function BulkOrder() {
             <AnimatePresence mode="popLayout">
               <div className="space-y-3">
                 {items.map((item) => {
-                  const vehicle = vehicles.find(v => v.id === item.vehicleId);
+                  const vehicle = vehicleMap.get(item.vehicleId);
                   return (
                     <motion.div
                       key={item.id}

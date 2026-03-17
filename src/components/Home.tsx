@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { MapPin, Bell, Fuel, Car, Clock, ChevronRight, Settings, ArrowRight, AlertCircle, Droplets, Users } from 'lucide-react';
+import { MapPin, Bell, Fuel, Car, Clock, Settings, ArrowRight, AlertCircle, Droplets, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import VehicleSelectModal from './VehicleSelectModal';
@@ -10,6 +10,7 @@ export default function Home() {
   const navigate = useNavigate();
   const unreadCount = notifications.filter(n => !n.read).length;
   const recentOrders = [...orders].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 2);
+  const vehiclesWithReminders = vehicles.filter(v => v.tankCapacity && v.avgDailyKm);
 
   const [showVehicleModal, setShowVehicleModal] = useState(false);
   const [pendingReorder, setPendingReorder] = useState<typeof orders[0] | null>(null);
@@ -45,6 +46,8 @@ export default function Home() {
       navigate('/checkout');
     }
   };
+
+  const vehiclesWithRefillData = vehicles.filter(v => v.tankCapacity && v.avgDailyKm);
 
   return (
     <div className="min-h-screen bg-bg flex flex-col transition-colors">
@@ -139,7 +142,7 @@ export default function Home() {
         </div>
 
         {/* Feature 6: Predictive Refill Reminders */}
-        {vehicles.filter(v => v.tankCapacity && v.avgDailyKm).length > 0 && (
+        {vehiclesWithReminders.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -149,7 +152,7 @@ export default function Home() {
               <Droplets size={18} className="mr-2 text-primary" /> Refill Reminders
             </h3>
             <div className="space-y-3">
-              {vehicles.filter(v => v.tankCapacity && v.avgDailyKm).map(vehicle => {
+              {vehiclesWithReminders.map(vehicle => {
                 const fuelEfficiency = vehicle.fuelType === 'Petrol' ? 15 : 20; // km/L estimate
                 const dailyFuelUsage = (vehicle.avgDailyKm || 1) / fuelEfficiency;
                 const daysUntilEmpty = Math.floor((vehicle.tankCapacity || 1) / dailyFuelUsage);
