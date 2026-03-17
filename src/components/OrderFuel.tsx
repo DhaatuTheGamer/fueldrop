@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { ArrowLeft, Car, Fuel as FuelIcon, ArrowRight, Clock, TrendingDown, TrendingUp, ShoppingCart, Plus, Zap, MessageSquareText, CheckCircle2 } from 'lucide-react';
+import { motion } from 'motion/react';
+import { ArrowLeft, Fuel as FuelIcon, ArrowRight, Clock, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import { FuelType } from '../types';
@@ -9,47 +9,10 @@ import SchedulePicker from './SchedulePicker';
 import { useDynamicPricing } from '../hooks/useDynamicPricing';
 import { SkeletonPricing } from './SkeletonLoader';
 import FuelCart from './FuelCart';
-
-// Simulated 7-day price history
-const PRICE_HISTORY: Record<FuelType, number[]> = {
-  Petrol: [102.10, 101.95, 101.80, 101.90, 101.70, 101.60, 101.50],
-  Diesel: [89.80, 89.65, 89.50, 89.40, 89.35, 89.25, 89.20],
-};
-
-const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Today'];
-
-function SparklineChart({ data, color = '#E56B25' }: { data: number[]; color?: string }) {
-  const min = Math.min(...data);
-  const max = Math.max(...data);
-  const range = max - min || 1;
-  const width = 140;
-  const height = 36;
-  const padding = 4;
-
-  const points = data.map((value, i) => {
-    const x = padding + (i / (data.length - 1)) * (width - padding * 2);
-    const y = height - padding - ((value - min) / range) * (height - padding * 2);
-    return `${x},${y}`;
-  });
-
-  const linePath = `M ${points.join(' L ')}`;
-  const areaPath = `${linePath} L ${width - padding},${height - padding} L ${padding},${height - padding} Z`;
-
-  return (
-    <svg width={width} height={height} className="overflow-visible">
-      <defs>
-        <linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={color} stopOpacity={0.3} />
-          <stop offset="100%" stopColor={color} stopOpacity={0} />
-        </linearGradient>
-      </defs>
-      <path d={areaPath} fill="url(#sparkGrad)" />
-      <path d={linePath} fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-      {/* End dot */}
-      <circle cx={parseFloat(points[points.length - 1].split(',')[0])} cy={parseFloat(points[points.length - 1].split(',')[1])} r={3} fill={color} />
-    </svg>
-  );
-}
+import PriceTrendIndicator from './PriceTrendIndicator';
+import VehicleSelector from './VehicleSelector';
+import EmergencyToggle from './EmergencyToggle';
+import DeliveryInstructions from './DeliveryInstructions';
 
 export default function OrderFuel() {
   const { vehicles, setCurrentOrder, location, setLocation, addNotification, cart, setCart } = useAppContext();
@@ -91,13 +54,6 @@ export default function OrderFuel() {
       return () => clearTimeout(timer);
     }
   }, [value, fuelType, orderType]);
-
-  // Price trend calculation
-  const history = PRICE_HISTORY[fuelType];
-  const yesterdayPrice = history[history.length - 2];
-  const todayPrice = history[history.length - 1];
-  const priceDiff = todayPrice - yesterdayPrice;
-  const isFalling = priceDiff < 0;
 
   const handleContinue = () => {
     if (!selectedVehicle) {
@@ -177,47 +133,17 @@ export default function OrderFuel() {
         </section>
 
         {/* Vehicle Selection */}
-        <section className="card-brutal p-6 transition-colors">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="label-small">Select Vehicle</h2>
-            <button onClick={() => navigate('/garage')} className="text-primary text-xs font-heading font-bold uppercase tracking-wider hover:underline">Add New</button>
-          </div>
-          
-          {vehicles.length === 0 ? (
-            <div className="text-center py-4 bg-bg rounded-sm border-2 border-border transition-colors">
-              <p className="text-muted font-body text-sm mb-2">No vehicles found</p>
-              <button onClick={() => navigate('/garage')} className="text-primary font-heading font-bold text-sm uppercase tracking-wider hover:underline">Go to Garage</button>
-            </div>
-          ) : (
-            <div className="flex overflow-x-auto pb-4 -mx-2 px-2 space-x-4 snap-x">
-              {vehicles.map((vehicle) => (
-                <button
-                  key={vehicle.id}
-                  onClick={() => {
-                    setSelectedVehicle(vehicle.id);
-                    setFuelType(vehicle.fuelType);
-                    setAutoSelected(false);
-                  }}
-                  className={`shrink-0 w-40 p-4 rounded-sm border-2 text-left snap-start transition-all relative ${
-                    selectedVehicle === vehicle.id
-                      ? 'border-primary bg-surface shadow-brutal-sm'
-                      : 'border-border bg-bg hover:border-muted'
-                  }`}
-                >
-                  {/* Feature 1: Auto-selected badge */}
-                  {autoSelected && selectedVehicle === vehicle.id && (
-                    <span className="absolute -top-2 -right-2 bg-accent text-bg text-[9px] font-heading font-bold px-1.5 py-0.5 rounded-sm border-2 border-border flex items-center">
-                      <CheckCircle2 size={10} className="mr-0.5" /> AUTO
-                    </span>
-                  )}
-                  <Car size={24} className={`mb-2 ${selectedVehicle === vehicle.id ? 'text-primary' : 'text-muted'}`} />
-                  <p className="font-heading font-bold text-text truncate">{vehicle.make} {vehicle.model}</p>
-                  <p className="text-xs text-muted font-body mt-1">{vehicle.licensePlate}</p>
-                </button>
-              ))}
-            </div>
-          )}
-        </section>
+        <VehicleSelector
+          vehicles={vehicles}
+          selectedVehicle={selectedVehicle}
+          onSelectVehicle={(id, type) => {
+            setSelectedVehicle(id);
+            setFuelType(type as FuelType);
+            setAutoSelected(false);
+          }}
+          autoSelected={autoSelected}
+          onAddNew={() => navigate('/garage')}
+        />
 
         {/* Fuel Details */}
         <section className="card-brutal p-6 transition-colors">
@@ -243,34 +169,7 @@ export default function OrderFuel() {
           </div>
 
           {/* Price Trend Indicator */}
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-6 p-4 bg-bg border-2 border-border rounded-sm transition-colors"
-          >
-            <div className="flex items-center justify-between mb-2">
-              <div>
-                <p className="text-xs text-muted font-body uppercase tracking-wider">Today's Price</p>
-                <p className="font-heading font-bold text-2xl text-text">₹{FUEL_PRICE[fuelType]}<span className="text-sm text-muted">/L</span></p>
-              </div>
-              <SparklineChart data={PRICE_HISTORY[fuelType]} color={isFalling ? '#2B825B' : '#E56B25'} />
-            </div>
-            <div className="flex items-center space-x-2">
-              {isFalling ? (
-                <TrendingDown size={14} className="text-accent" />
-              ) : (
-                <TrendingUp size={14} className="text-primary" />
-              )}
-              <span className={`text-xs font-heading font-bold ${isFalling ? 'text-accent' : 'text-primary'}`}>
-                {isFalling ? '↓' : '↑'} ₹{Math.abs(priceDiff).toFixed(2)} since yesterday
-              </span>
-            </div>
-            {isFalling && (
-              <p className="text-[10px] text-accent font-body mt-2 bg-accent/10 px-2 py-1 rounded-sm inline-block border border-accent/20">
-                Prices are falling — good time to top up!
-              </p>
-            )}
-          </motion.div>
+          <PriceTrendIndicator fuelType={fuelType} fuelPrice={FUEL_PRICE[fuelType]} />
 
           <div className="flex p-1 bg-bg border-2 border-border rounded-sm mb-6 transition-colors">
             <button
@@ -385,62 +284,16 @@ export default function OrderFuel() {
         />
 
         {/* Feature 5: Emergency Priority Toggle */}
-        <section className="card-brutal p-6 transition-colors">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className={`w-10 h-10 rounded-sm border-2 border-border flex items-center justify-center shadow-brutal-sm transition-colors ${isEmergency ? 'bg-red-500 text-white' : 'bg-surface text-muted'}`}>
-                <Zap size={20} />
-              </div>
-              <div>
-                <p className="font-heading font-bold text-text uppercase tracking-wider text-sm">Emergency Refill</p>
-                <p className="text-xs text-muted font-body">Skip the queue • Priority dispatch</p>
-              </div>
-            </div>
-            <button
-              onClick={() => setIsEmergency(!isEmergency)}
-              className={`relative w-14 h-7 rounded-full border-2 border-border transition-colors ${isEmergency ? 'bg-red-500' : 'bg-bg'}`}
-            >
-              <motion.div
-                animate={{ x: isEmergency ? 26 : 2 }}
-                transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                className={`absolute top-0.5 w-5 h-5 rounded-full border-2 border-border shadow-sm ${isEmergency ? 'bg-white' : 'bg-muted'}`}
-              />
-            </button>
-          </div>
-          <AnimatePresence>
-            {isEmergency && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                className="overflow-hidden"
-              >
-                <div className="mt-4 p-3 bg-red-500/10 border-2 border-red-500/30 rounded-sm">
-                  <p className="text-xs font-heading font-bold text-red-500 uppercase tracking-wider flex items-center">
-                    <Zap size={12} className="mr-1" /> +₹150 Emergency Surge Fee
-                  </p>
-                  <p className="text-[10px] text-muted font-body mt-1">Your order will be prioritized to the nearest available captain.</p>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </section>
+        <EmergencyToggle
+          isEmergency={isEmergency}
+          onToggle={() => setIsEmergency(!isEmergency)}
+        />
 
         {/* Feature 4: Delivery Instructions */}
-        <section className="card-brutal p-6 transition-colors">
-          <div className="flex items-center space-x-3 mb-4">
-            <MessageSquareText size={18} className="text-primary" />
-            <h2 className="label-small">Delivery Instructions <span className="text-muted font-normal normal-case">(optional)</span></h2>
-          </div>
-          <textarea
-            value={deliveryInstructions}
-            onChange={(e) => setDeliveryInstructions(e.target.value)}
-            placeholder="e.g., Park near Pillar 4B, call from security gate..."
-            className="input-brutal w-full h-20 resize-none text-sm"
-            maxLength={200}
-          />
-          <p className="text-[10px] text-muted font-body mt-1 text-right">{deliveryInstructions.length}/200</p>
-        </section>
+        <DeliveryInstructions
+          value={deliveryInstructions}
+          onChange={setDeliveryInstructions}
+        />
 
         {/* Action Buttons */}
         <div className="pb-8 space-y-3">
