@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import { OrderStatus } from '../types';
 import { getActiveOrders, onOrderChange, updateOrderStatus as bridgeUpdateStatus } from '../services/orderBridge';
+import { SUPPORT_PHONE } from '../config/constants';
 
 const statuses: OrderStatus[] = ['Pending', 'Accepted', 'Out for Delivery', 'Arriving', 'Delivered'];
 
@@ -12,7 +13,7 @@ const SUPPORT_OPTIONS = [
   { id: 'find', icon: <MapPin size={18} />, label: "Captain can't find my vehicle", desc: 'We\'ll share your exact location' },
   { id: 'delay', icon: <Clock size={18} />, label: 'Delivery is taking too long', desc: 'We\'ll check with the captain' },
   { id: 'cancel', icon: <Ban size={18} />, label: 'Cancel this order', desc: 'Cancellation charges may apply' },
-  { id: 'call', icon: <PhoneCall size={18} />, label: 'Call Support: 1800-XXX-XXXX', desc: 'Available 24/7' },
+  { id: 'call', icon: <PhoneCall size={18} />, label: `Call Support: ${SUPPORT_PHONE}`, desc: 'Available 24/7' },
 ];
 
 export default function LiveTracking() {
