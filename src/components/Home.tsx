@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+// ⚡ Bolt: Memoized derived state to prevent unnecessary recalculations on re-renders
+import React, { useState, useMemo } from 'react';
 import { motion } from 'motion/react';
 import { MapPin, Bell, Fuel, Car, Clock, Settings, ArrowRight, AlertCircle, Droplets, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -8,9 +9,9 @@ import VehicleSelectModal from './VehicleSelectModal';
 export default function Home() {
   const { user, orders, notifications, vehicles, setCurrentOrder, addNotification } = useAppContext();
   const navigate = useNavigate();
-  const unreadCount = notifications.filter(n => !n.read).length;
-  const recentOrders = [...orders].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 2);
-  const vehiclesWithReminders = vehicles.filter(v => v.tankCapacity && v.avgDailyKm);
+  const unreadCount = useMemo(() => notifications.filter(n => !n.read).length, [notifications]);
+  const recentOrders = useMemo(() => [...orders].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 2), [orders]);
+  const vehiclesWithReminders = useMemo(() => vehicles.filter(v => v.tankCapacity && v.avgDailyKm), [vehicles]);
 
   const [showVehicleModal, setShowVehicleModal] = useState(false);
   const [pendingReorder, setPendingReorder] = useState<typeof orders[0] | null>(null);
