@@ -145,38 +145,6 @@ Navigate to `http://localhost:3000/captain` to access the Captain Dashboard. Thi
 
 ---
 
-## 📂 Project Structure
-
-```text
-fueldrop/
-├── src/
-│   ├── components/         # UI components
-│   │   ├── captain/        # Captain dashboard & order management
-│   │   ├── Home.tsx        # Dashboard with refill reminders & fleet access
-│   │   ├── OrderFuel.tsx   # Order flow with emergency & delivery instructions
-│   │   ├── Checkout.tsx    # Checkout with promo discovery & emergency surcharge
-│   │   ├── LiveTracking.tsx # Tracking with modification grace period
-│   │   ├── BulkOrder.tsx   # Fleet mode — multi-vehicle bulk ordering
-│   │   ├── Garage.tsx      # Vehicle management with tank capacity fields
-│   │   ├── Rating.tsx      # Feedback with savings gamification
-│   │   └── ...             # Login, Profile, Settings, etc.
-│   ├── context/            # Global state management (AppContext)
-│   ├── hooks/              # Custom hooks (useDynamicPricing, useFocusTrap, etc.)
-│   ├── services/           # Order bridge (localStorage cross-tab sync)
-│   ├── App.tsx             # Root component & route configuration
-│   ├── main.tsx            # Entry point
-│   ├── index.css           # Design system (Tailwind theme, brutalist utilities)
-│   └── types.ts            # Shared TypeScript interfaces
-├── .github/
-│   └── workflows/          # CI pipeline (lint + build)
-├── index.html              # HTML entry with SEO meta tags
-├── vite.config.ts          # Build configuration
-├── tsconfig.json           # TypeScript compiler settings
-└── package.json            # Dependencies & scripts
-```
-
----
-
 ## 🤝 Contributing
 
 We love contributions! Whether it's a bug fix, a new feature, or improved documentation, satisfy your curiosity by helping us build FuelDrop.
