@@ -64,11 +64,15 @@ export default function Home() {
         <div className="flex items-center space-x-3">
           <button 
             onClick={() => navigate('/settings')}
+            aria-label="Settings"
             className="p-2 text-text border-2 border-border rounded-sm hover:border-primary hover:text-primary transition-colors bg-bg"
           >
             <Settings size={20} />
           </button>
-          <button className="p-2 text-text border-2 border-border rounded-sm hover:border-primary hover:text-primary transition-colors bg-bg relative">
+          <button
+            aria-label="Notifications"
+            className="p-2 text-text border-2 border-border rounded-sm hover:border-primary hover:text-primary transition-colors bg-bg relative"
+          >
             <Bell size={20} />
             {unreadCount > 0 && (
               <span className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-sm border-2 border-border"></span>
