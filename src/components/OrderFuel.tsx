@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowLeft, Car, Fuel as FuelIcon, ArrowRight, Clock, TrendingDown, TrendingUp, ShoppingCart, Plus, Zap, MessageSquareText, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Car, Fuel as FuelIcon, ArrowRight, Clock, TrendingDown, TrendingUp, Plus, Zap, MessageSquareText, CheckCircle2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import { FuelType } from '../types';

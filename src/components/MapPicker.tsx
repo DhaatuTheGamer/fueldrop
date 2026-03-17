@@ -9,14 +9,11 @@ import SaveAddressDialog from './SaveAddressDialog';
 import ManualAddressEntry from './ManualAddressEntry';
 
 // Fix Leaflet default marker icon issue
-const markerIcon = new L.Icon({
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
   iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
 });
 
 function DraggableMarker({ position, onDragEnd }: { position: [number, number]; onDragEnd: (lat: number, lng: number) => void }) {
@@ -31,7 +28,6 @@ function DraggableMarker({ position, onDragEnd }: { position: [number, number]; 
   return (
     <Marker
       position={position}
-      icon={markerIcon}
       draggable
       ref={markerRef}
       eventHandlers={{
