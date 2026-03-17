@@ -11,6 +11,8 @@ export default function Home() {
   const navigate = useNavigate();
   const unreadCount = notifications.filter(n => !n.read).length;
 
+  const vehiclesWithRefillData = vehicles.filter(v => v.tankCapacity && v.avgDailyKm);
+
   return (
     <div className="min-h-screen bg-bg flex flex-col transition-colors">
       <header className="bg-surface border-b-2 border-border px-6 py-4 flex items-center justify-between sticky top-0 z-10 transition-colors">
