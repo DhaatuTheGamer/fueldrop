@@ -10,6 +10,7 @@ export default function Login() {
   const [step, setStep] = useState<'phone' | 'otp'>('phone');
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [countdown, setCountdown] = useState(30);
+  const [isLoading, setIsLoading] = useState(false);
   const { setUser, addNotification, vehicles, hasCompletedOnboarding } = useAppContext();
   const navigate = useNavigate();
 
@@ -34,15 +35,33 @@ export default function Login() {
     addNotification('OTP Resent', 'A new OTP has been sent to your mobile number.', 'info');
   };
 
-  const handleOtpSubmit = (e: React.FormEvent) => {
+  const handleOtpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (otp === '1234') {
-      setUser({
-        id: 'user-1',
-        phone,
-        name: 'Guest User',
-        email: '',
+    setIsLoading(true);
+
+    try {
+      const response = await fetch('/api/auth/verify-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ phone, otp }),
       });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Invalid OTP');
+      }
+
+      const data = await response.json();
+
+      setUser({
+        id: data.user?.id || 'user-1',
+        phone,
+        name: data.user?.name || 'Guest User',
+        email: data.user?.email || '',
+      });
+
       // Route new users to onboarding, returning users to home
       if (!hasCompletedOnboarding && vehicles.length === 0) {
         navigate('/onboarding');
@@ -52,8 +71,10 @@ export default function Login() {
       setTimeout(() => {
         addNotification('Welcome to FuelDrop!', 'Get ₹50 off on your first order with code FIRST50', 'success');
       }, 1000);
-    } else {
-      addNotification('Invalid OTP', 'Please use 1234 for testing.', 'warning');
+    } catch (error) {
+      addNotification('Error', error instanceof Error ? error.message : 'Failed to verify OTP. Please try again.', 'warning');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -127,14 +148,21 @@ export default function Login() {
                 placeholder="1234"
                 required
               />
-              <p className="mt-2 text-xs text-muted text-center font-body uppercase tracking-wider">Use 1234 for testing</p>
             </div>
             <button
               type="submit"
-              disabled={otp.length < 4}
-              className="btn-primary w-full"
+              disabled={otp.length < 4 || isLoading}
+              className="btn-primary w-full flex justify-center items-center"
             >
-              Verify & Login
+              {isLoading ? (
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
+                  className="w-5 h-5 border-2 border-bg border-t-transparent rounded-full"
+                />
+              ) : (
+                'Verify & Login'
+              )}
             </button>
             <div className="flex flex-col space-y-3 mt-4">
               <button

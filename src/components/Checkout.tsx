@@ -146,9 +146,15 @@ export default function Checkout() {
           <h2 className="label-small mb-4">Order Summary</h2>
           
           {/* Multi-item display */}
-          {allItems.map((item, idx) => {
-            const vehicle = vehicles.find(v => v.id === item.vehicleId);
-            return (
+          {(() => {
+            const vehiclesMap = vehicles.reduce((acc, v) => {
+              acc[v.id] = v;
+              return acc;
+            }, {} as Record<string, typeof vehicles[0]>);
+
+            return allItems.map((item, idx) => {
+              const vehicle = vehiclesMap[item.vehicleId];
+              return (
               <div key={item.id} className={`flex items-center justify-between ${idx < allItems.length - 1 ? 'mb-3 pb-3 border-b-2 border-border' : 'mb-4 pb-4 border-b-2 border-border'} transition-colors`}>
                 <div className="flex items-center">
                   <div className="w-12 h-12 bg-bg border-2 border-border rounded-sm flex items-center justify-center text-primary mr-4 transition-colors shadow-brutal-sm">
@@ -165,7 +171,8 @@ export default function Checkout() {
                 <p className="font-heading font-bold text-lg text-text">₹{item.amountRupees.toFixed(2)}</p>
               </div>
             );
-          })}
+            });
+          })()}
 
           <div className="flex items-start space-x-3 text-sm text-text font-body">
             <MapPin size={18} className="shrink-0 mt-0.5 text-primary" />
