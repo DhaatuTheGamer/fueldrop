@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion } from 'motion/react';
 import { ArrowLeft, User as UserIcon, Mail, Phone, LogOut, Edit2, Check, Heart, ChevronRight, Camera, Gift, Copy, Share2, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -11,8 +11,13 @@ export default function Profile() {
   const [name, setName] = useState(user?.name || '');
   const [email, setEmail] = useState(user?.email || '');
 
-  // Generate mock referral code
-  const referralCode = `FUEL${(user?.name || 'USER').slice(0, 4).toUpperCase()}${Math.floor(1000 + Math.random() * 9000)}`;
+  // Generate mock referral code using CSPRNG
+  const referralCode = useMemo(() => {
+    const randomBuffer = new Uint32Array(1);
+    window.crypto.getRandomValues(randomBuffer);
+    const randomNumber = randomBuffer[0] / (0xffffffff + 1);
+    return `FUEL${(user?.name || 'USER').slice(0, 4).toUpperCase()}${Math.floor(1000 + randomNumber * 9000)}`;
+  }, [user?.name]);
 
   const handleSave = () => {
     if (user) {
