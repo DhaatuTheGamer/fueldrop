@@ -1,17 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { ArrowLeft, CreditCard, Wallet, Tag, MapPin, Fuel, ArrowRight, Heart, Calendar, Gift, Copy, X, Zap, MessageSquareText } from 'lucide-react';
+import React, { useState } from 'react';
+import { motion } from 'motion/react';
+import { ArrowLeft, Tag, MapPin, Fuel, ArrowRight, Calendar, Zap, MessageSquareText, Gift } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import { Order } from '../types';
 import SafetyChecklist from './SafetyChecklist';
 import { useDynamicPricing } from '../hooks/useDynamicPricing';
-import { useFocusTrap } from '../hooks/useFocusTrap';
 import { publishOrder } from '../services/orderBridge';
-
-const AVAILABLE_OFFERS = [
-  { code: 'FIRST50', description: '₹50 off your first order', discount: 50, minOrder: 200 },
-];
+import CheckoutPaymentMethods from './CheckoutPaymentMethods';
+import CheckoutOffersSheet from './CheckoutOffersSheet';
+import CheckoutConfirmModal from './CheckoutConfirmModal';
 
 export default function Checkout() {
   const { currentOrder, setCurrentOrder, setOrders, orders, addNotification, favoriteOrders, setFavoriteOrders, cart, setCart, vehicles } = useAppContext();
@@ -20,20 +18,8 @@ export default function Checkout() {
   const [promoCode, setPromoCode] = useState('');
   const [discount, setDiscount] = useState(0);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [saveAsFavorite, setSaveAsFavorite] = useState(false);
-  const [favoriteName, setFavoriteName] = useState('');
   const [safetyChecked, setSafetyChecked] = useState(false);
   const [showOffersSheet, setShowOffersSheet] = useState(false);
-
-  // Focus trap for confirmation modal (Feature 8)
-  const confirmModalRef = useFocusTrap(showConfirmModal);
-
-  // Close on Escape
-  useEffect(() => {
-    const handleEscape = () => setShowConfirmModal(false);
-    document.addEventListener('modal-escape' as any, handleEscape);
-    return () => document.removeEventListener('modal-escape' as any, handleEscape);
-  }, []);
 
   if (!currentOrder) {
     navigate('/order');
@@ -84,7 +70,7 @@ export default function Checkout() {
     setShowConfirmModal(true);
   };
 
-  const confirmOrder = () => {
+  const confirmOrder = (saveAsFavorite: boolean, favoriteName: string) => {
     const mainVehicle = vehicles.find(v => v.id === currentOrder.vehicleId);
     
     const newOrder: Order = {
@@ -257,31 +243,7 @@ export default function Checkout() {
         </section>
 
         {/* Payment Methods */}
-        <section className="card-brutal p-6 transition-colors">
-          <h2 className="label-small mb-4">Payment Method</h2>
-          <div className="space-y-3">
-            {[
-              { id: 'upi', label: 'UPI (GPay, PhonePe)', icon: <span className="font-heading font-bold text-primary text-xs uppercase tracking-wider">UPI</span> },
-              { id: 'card', label: 'Credit / Debit Card', icon: <CreditCard size={20} /> },
-              { id: 'cash', label: 'Cash on Delivery', icon: <Wallet size={20} /> },
-            ].map(method => (
-              <label key={method.id} className={`flex items-center justify-between p-4 rounded-sm border-2 cursor-pointer transition-all ${
-                paymentMethod === method.id ? 'border-primary bg-surface shadow-brutal-sm' : 'border-border bg-bg hover:border-muted'
-              }`}>
-                <input type="radio" name="payment" value={method.id} checked={paymentMethod === method.id} onChange={() => setPaymentMethod(method.id)} className="hidden" />
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-bg border-2 border-border rounded-sm flex items-center justify-center shadow-brutal-sm transition-colors text-text">
-                    {method.icon}
-                  </div>
-                  <span className="font-heading font-bold text-text uppercase tracking-wider text-sm">{method.label}</span>
-                </div>
-                <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${paymentMethod === method.id ? 'border-primary' : 'border-border'}`}>
-                  {paymentMethod === method.id && <div className="w-3 h-3 bg-primary rounded-full" />}
-                </div>
-              </label>
-            ))}
-          </div>
-        </section>
+        <CheckoutPaymentMethods paymentMethod={paymentMethod} setPaymentMethod={setPaymentMethod} />
 
         {/* Safety Checklist */}
         <SafetyChecklist onAllChecked={setSafetyChecked} />
@@ -337,168 +299,24 @@ export default function Checkout() {
         </div>
       </main>
 
-      {/* Confirmation Modal (with focus trap) */}
-      <AnimatePresence>
-        {showConfirmModal && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-bg/80 backdrop-blur-sm z-50 flex items-center justify-center p-6"
-          >
-            <motion.div 
-              ref={confirmModalRef}
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="card-brutal p-6 w-full max-w-sm transition-colors"
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="confirm-dialog-title"
-            >
-              <h3 id="confirm-dialog-title" className="text-xl font-heading font-bold text-text uppercase tracking-wider mb-4">Confirm Order</h3>
-              
-              <div className="bg-bg border-2 border-border rounded-sm p-4 mb-6 space-y-3 transition-colors">
-                <div className="flex justify-between text-sm font-body">
-                  <span className="text-muted">Fuel</span>
-                  <span className="font-heading font-bold text-text uppercase tracking-wider">
-                    {hasCartItems ? `${allItems.length} items` : `${currentOrder.fuelType} (${currentOrder.quantityLiters?.toFixed(2)}L)`}
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm font-body">
-                  <span className="text-muted">Total</span>
-                  <span className="font-heading font-bold text-primary">₹{total.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-sm font-body">
-                  <span className="text-muted">Payment</span>
-                  <span className="font-heading font-bold text-text uppercase tracking-wider">{paymentMethod}</span>
-                </div>
-                {currentOrder.isEmergency && (
-                  <div className="flex justify-between text-sm font-body">
-                    <span className="text-red-500 flex items-center"><Zap size={12} className="mr-1" /> Priority</span>
-                    <span className="font-heading font-bold text-red-500">EMERGENCY</span>
-                  </div>
-                )}
-              </div>
-
-              <div className="mb-6">
-                <label className="flex items-start space-x-3 cursor-pointer">
-                  <input 
-                    type="checkbox" 
-                    checked={saveAsFavorite}
-                    onChange={(e) => setSaveAsFavorite(e.target.checked)}
-                    className="mt-1 w-4 h-4 text-primary rounded-sm focus:ring-primary border-2 border-border bg-bg accent-primary"
-                  />
-                  <div>
-                    <span className="text-sm font-heading font-bold text-text uppercase tracking-wider flex items-center">
-                      Save as Favorite <Heart size={14} className="ml-1 text-primary" />
-                    </span>
-                    <p className="text-xs text-muted font-body mt-0.5">Quickly reorder this exact fuel amount and location next time.</p>
-                  </div>
-                </label>
-                
-                <AnimatePresence>
-                  {saveAsFavorite && (
-                    <motion.div 
-                      initial={{ height: 0, opacity: 0, marginTop: 0 }}
-                      animate={{ height: 'auto', opacity: 1, marginTop: 12 }}
-                      exit={{ height: 0, opacity: 0, marginTop: 0 }}
-                      className="overflow-hidden"
-                    >
-                      <input
-                        type="text"
-                        value={favoriteName}
-                        onChange={(e) => setFavoriteName(e.target.value)}
-                        placeholder="e.g., Home Car Refill"
-                        className="input-brutal text-sm"
-                        required={saveAsFavorite}
-                      />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-              
-              <div className="flex space-x-3">
-                <button 
-                  onClick={() => setShowConfirmModal(false)}
-                  className="btn-secondary flex-1 py-3"
-                >
-                  Cancel
-                </button>
-                <button 
-                  onClick={confirmOrder}
-                  disabled={saveAsFavorite && !favoriteName.trim()}
-                  className="btn-primary flex-1 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Confirm
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Confirmation Modal */}
+      <CheckoutConfirmModal
+        isOpen={showConfirmModal}
+        onClose={() => setShowConfirmModal(false)}
+        onConfirm={confirmOrder}
+        currentOrder={currentOrder}
+        total={total}
+        paymentMethod={paymentMethod}
+        hasCartItems={hasCartItems}
+        allItemsLength={allItems.length}
+      />
 
       {/* Feature 2: Available Offers Bottom Sheet */}
-      <AnimatePresence>
-        {showOffersSheet && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-bg/80 backdrop-blur-sm z-50 flex items-end justify-center"
-            onClick={() => setShowOffersSheet(false)}
-          >
-            <motion.div
-              initial={{ y: '100%' }}
-              animate={{ y: 0 }}
-              exit={{ y: '100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-md bg-surface border-t-2 border-x-2 border-border rounded-t-sm p-6"
-            >
-              <div className="flex justify-between items-center mb-4">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-primary/20 border-2 border-primary rounded-sm flex items-center justify-center">
-                    <Gift size={20} className="text-primary" />
-                  </div>
-                  <h3 className="font-heading font-bold text-lg text-text uppercase tracking-wider">Available Offers</h3>
-                </div>
-                <button onClick={() => setShowOffersSheet(false)} className="text-muted hover:text-text transition-colors">
-                  <X size={20} />
-                </button>
-              </div>
-
-              <div className="space-y-3">
-                {AVAILABLE_OFFERS.map((offer) => (
-                  <div
-                    key={offer.code}
-                    className="p-4 bg-bg border-2 border-border rounded-sm transition-colors"
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-heading font-bold text-primary text-sm uppercase tracking-wider bg-primary/10 px-2 py-1 rounded-sm border border-primary/20">
-                        {offer.code}
-                      </span>
-                      <span className="font-heading font-bold text-accent text-lg">-₹{offer.discount}</span>
-                    </div>
-                    <p className="text-sm text-text font-body mb-3">{offer.description}</p>
-                    <p className="text-[10px] text-muted font-body mb-3">Min. order: ₹{offer.minOrder}</p>
-                    <button
-                      onClick={() => handleCopyAndApply(offer.code)}
-                      className="btn-primary w-full py-2 text-sm flex items-center justify-center"
-                    >
-                      <Copy size={14} className="mr-2" /> Copy & Apply
-                    </button>
-                  </div>
-                ))}
-              </div>
-
-              <button onClick={() => setShowOffersSheet(false)} className="btn-secondary w-full mt-4 py-3">
-                Close
-              </button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <CheckoutOffersSheet
+        isOpen={showOffersSheet}
+        onClose={() => setShowOffersSheet(false)}
+        onApplyOffer={handleCopyAndApply}
+      />
     </div>
   );
 }
