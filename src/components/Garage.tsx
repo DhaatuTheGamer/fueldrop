@@ -143,7 +143,7 @@ export default function Garage() {
             >
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-heading font-bold text-text uppercase tracking-wider">{editingId ? 'Edit Vehicle' : 'Add New Vehicle'}</h2>
-                <button onClick={cancelEdit} className="text-muted hover:text-text transition-colors">
+                <button aria-label="Cancel edit" onClick={cancelEdit} className="text-muted hover:text-text transition-colors">
                   <X size={24} />
                 </button>
               </div>

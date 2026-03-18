@@ -72,7 +72,7 @@ export default function Profile() {
               {user?.name.charAt(0) || 'U'}
             </div>
             {isEditing && (
-              <button className="absolute -bottom-2 -right-2 w-8 h-8 bg-surface border-2 border-border rounded-sm flex items-center justify-center text-primary shadow-brutal-sm hover:bg-bg transition-colors">
+              <button aria-label="Change profile picture" className="absolute -bottom-2 -right-2 w-8 h-8 bg-surface border-2 border-border rounded-sm flex items-center justify-center text-primary shadow-brutal-sm hover:bg-bg transition-colors">
                 <Camera size={16} />
               </button>
             )}
@@ -156,10 +156,7 @@ export default function Profile() {
                 <p className="text-[10px] text-muted font-body uppercase tracking-wider">Your Referral Code</p>
                 <p className="font-heading font-bold text-text text-lg tracking-[0.2em]">{referralCode}</p>
               </div>
-              <button
-                onClick={handleCopyCode}
-                className="w-10 h-10 bg-surface border-2 border-border rounded-sm flex items-center justify-center text-primary shadow-brutal-sm hover:bg-bg transition-colors"
-              >
+              <button aria-label="Copy referral code" onClick={handleCopyCode} className="w-10 h-10 bg-surface border-2 border-border rounded-sm flex items-center justify-center text-primary shadow-brutal-sm hover:bg-bg transition-colors">
                 <Copy size={18} />
               </button>
             </div>

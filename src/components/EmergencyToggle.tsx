@@ -21,6 +21,7 @@ export default function EmergencyToggle({ isEmergency, onToggle }: EmergencyTogg
           </div>
         </div>
         <button
+          aria-label={isEmergency ? "Turn off emergency mode" : "Turn on emergency mode"}
           onClick={onToggle}
           className={`relative w-14 h-7 rounded-full border-2 border-border transition-colors ${isEmergency ? 'bg-red-500' : 'bg-bg'}`}
         >

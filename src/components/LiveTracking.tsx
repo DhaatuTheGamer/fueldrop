@@ -311,10 +311,10 @@ export default function LiveTracking() {
                   </div>
                 </div>
                 <div className="flex space-x-2">
-                  <button className="w-10 h-10 bg-surface border-2 border-border rounded-sm flex items-center justify-center text-text shadow-brutal-sm hover:bg-bg transition-colors">
+                  <button aria-label="Message Captain" className="w-10 h-10 bg-surface border-2 border-border rounded-sm flex items-center justify-center text-text shadow-brutal-sm hover:bg-bg transition-colors">
                     <MessageSquare size={18} />
                   </button>
-                  <button className="w-10 h-10 bg-primary border-2 border-border rounded-sm flex items-center justify-center text-bg shadow-brutal-sm hover:bg-opacity-90 transition-colors">
+                  <button aria-label="Call Captain" className="w-10 h-10 bg-primary border-2 border-border rounded-sm flex items-center justify-center text-bg shadow-brutal-sm hover:bg-opacity-90 transition-colors">
                     <Phone size={18} />
                   </button>
                 </div>
@@ -361,7 +361,7 @@ export default function LiveTracking() {
                   </div>
                   <h3 className="font-heading font-bold text-lg text-text uppercase tracking-wider">Need Help?</h3>
                 </div>
-                <button onClick={() => setShowSOS(false)} className="text-muted hover:text-text transition-colors">
+                <button aria-label="Close SOS" onClick={() => setShowSOS(false)} className="text-muted hover:text-text transition-colors">
                   <X size={20} />
                 </button>
               </div>

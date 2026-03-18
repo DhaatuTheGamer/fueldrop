@@ -48,7 +48,7 @@ export default function VehicleSelectModal({ isOpen, onClose, onSelect, title = 
           >
             <div className="flex justify-between items-center mb-4">
               <h3 id="vehicle-select-title" className="text-lg font-heading font-bold text-text uppercase tracking-wider">{title}</h3>
-              <button onClick={onClose} className="text-muted hover:text-text transition-colors">
+              <button aria-label="Close" onClick={onClose} className="text-muted hover:text-text transition-colors">
                 <X size={20} />
               </button>
             </div>

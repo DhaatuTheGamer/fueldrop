@@ -438,7 +438,7 @@ export default function CaptainDashboard() {
                         <p className="text-xs text-muted font-body">{activeOrder.userPhone ? `+91 ${activeOrder.userPhone}` : '+91 XXXX XXXXX'}</p>
                       </div>
                     </div>
-                    <button className="w-10 h-10 bg-accent border-2 border-border rounded-sm flex items-center justify-center text-bg shadow-brutal-sm">
+                    <button aria-label="Call Customer" className="w-10 h-10 bg-accent border-2 border-border rounded-sm flex items-center justify-center text-bg shadow-brutal-sm">
                       <Phone size={18} />
                     </button>
                   </div>
