@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion } from 'motion/react';
 import { ArrowLeft, Tag, MapPin, Fuel, ArrowRight, Calendar, Zap, MessageSquareText, Gift } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -34,7 +34,7 @@ export default function Checkout() {
 
   // Calculate totals including any cart items
   const hasCartItems = cart.length > 0;
-  const allItems = hasCartItems ? cart : [{
+  const allItems = useMemo(() => hasCartItems ? cart : [{
     id: 'single',
     vehicleId: currentOrder.vehicleId || '',
     fuelType: currentOrder.fuelType || 'Petrol' as const,
@@ -42,9 +42,14 @@ export default function Checkout() {
     value: currentOrder.amountRupees || 0,
     quantityLiters: currentOrder.quantityLiters || 0,
     amountRupees: currentOrder.amountRupees || 0,
-  }];
+  }], [hasCartItems, cart, currentOrder]);
 
-  const subtotal = allItems.reduce((sum, item) => sum + item.amountRupees, 0);
+  const subtotal = useMemo(() => allItems.reduce((sum, item) => sum + item.amountRupees, 0), [allItems]);
+
+  const vehiclesMap = useMemo(() => vehicles.reduce((acc, v) => {
+    acc[v.id] = v;
+    return acc;
+  }, {} as Record<string, typeof vehicles[0]>), [vehicles]);
   const gst = subtotal * 0.18;
   const emergencyFee = currentOrder.isEmergency ? 150 : 0;
   const total = subtotal + pricing.deliveryFee + gst + emergencyFee - discount;
@@ -132,13 +137,7 @@ export default function Checkout() {
           <h2 className="label-small mb-4">Order Summary</h2>
           
           {/* Multi-item display */}
-          {(() => {
-            const vehiclesMap = vehicles.reduce((acc, v) => {
-              acc[v.id] = v;
-              return acc;
-            }, {} as Record<string, typeof vehicles[0]>);
-
-            return allItems.map((item, idx) => {
+          {allItems.map((item, idx) => {
               const vehicle = vehiclesMap[item.vehicleId];
               return (
               <div key={item.id} className={`flex items-center justify-between ${idx < allItems.length - 1 ? 'mb-3 pb-3 border-b-2 border-border' : 'mb-4 pb-4 border-b-2 border-border'} transition-colors`}>
@@ -157,8 +156,7 @@ export default function Checkout() {
                 <p className="font-heading font-bold text-lg text-text">₹{item.amountRupees.toFixed(2)}</p>
               </div>
             );
-            });
-          })()}
+          })}
 
           <div className="flex items-start space-x-3 text-sm text-text font-body">
             <MapPin size={18} className="shrink-0 mt-0.5 text-primary" />

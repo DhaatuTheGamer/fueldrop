@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CheckCircle2, Info, AlertTriangle, X } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
@@ -7,7 +7,7 @@ export default function NotificationToast() {
   const { notifications, markNotificationRead } = useAppContext();
 
   // Only show unread notifications, max 3 at a time
-  const visibleNotifications = notifications.filter(n => !n.read).slice(0, 3);
+  const visibleNotifications = useMemo(() => notifications.filter(n => !n.read).slice(0, 3), [notifications]);
 
   return (
     <div className="fixed top-4 left-0 right-0 z-50 flex flex-col items-center pointer-events-none px-4 space-y-2">
