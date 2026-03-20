@@ -62,12 +62,13 @@ export default function OrderHistory() {
     <div className="min-h-screen bg-bg flex flex-col transition-colors">
       <header className="bg-surface border-b-2 border-border px-6 py-4 flex items-center justify-between sticky top-0 z-10 transition-colors">
         <div className="flex items-center">
-          <button onClick={() => navigate('/')} className="mr-4 text-text hover:text-primary transition-colors">
+          <button aria-label="Go back" onClick={() => navigate('/')} className="mr-4 text-text hover:text-primary transition-colors">
             <ArrowLeft size={24} />
           </button>
           <h1 className="font-heading font-bold text-xl text-text uppercase tracking-wider">Order History</h1>
         </div>
         <button
+          aria-label={showFilters ? 'Hide filters' : 'Show filters'}
           onClick={() => setShowFilters(!showFilters)}
           className={`p-2 border-2 rounded-sm transition-colors ${showFilters ? 'bg-primary text-bg border-border' : 'bg-bg text-text border-border hover:border-primary'}`}
         >
