@@ -42,7 +42,7 @@ export default function Profile() {
 
   const handleShareWhatsApp = () => {
     const text = `Hey! Use my referral code ${referralCode} on FuelDrop and get ₹50 off your first fuel delivery! 🚗⛽`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank', 'noopener,noreferrer');
   };
 
   return (

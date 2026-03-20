@@ -446,7 +446,7 @@ export default function CaptainDashboard() {
                   {/* Feature 3: Navigate in Maps button */}
                   {activeOrder.location && (status === 'accepted' || status === 'pickup' || status === 'transit') && (
                     <button
-                      onClick={() => window.open(`https://maps.google.com/?daddr=${activeOrder.location.lat},${activeOrder.location.lng}`, '_blank')}
+                      onClick={() => window.open(`https://maps.google.com/?daddr=${activeOrder.location.lat},${activeOrder.location.lng}`, '_blank', 'noopener,noreferrer')}
                       className="card-brutal p-4 flex items-center justify-between transition-colors w-full hover:border-primary group"
                     >
                       <div className="flex items-center space-x-3">
