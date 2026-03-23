@@ -89,7 +89,7 @@ export default function BulkOrder() {
   return (
     <div className="min-h-screen bg-bg flex flex-col transition-colors">
       <header className="bg-surface border-b-2 border-border px-6 py-4 flex items-center sticky top-0 z-10 transition-colors">
-        <button onClick={() => navigate('/')} className="mr-4 text-text hover:text-primary transition-colors">
+        <button aria-label="Go back" onClick={() => navigate('/')} className="mr-4 text-text hover:text-primary transition-colors">
           <ArrowLeft size={24} />
         </button>
         <div className="flex items-center space-x-2">

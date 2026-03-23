@@ -8,7 +8,7 @@ export default function About() {
   return (
     <div className="min-h-screen bg-bg flex flex-col transition-colors">
       <header className="bg-surface border-b-2 border-border px-6 py-4 flex items-center sticky top-0 z-10 transition-colors">
-        <button onClick={() => navigate('/settings')} className="mr-4 text-text hover:text-primary transition-colors">
+        <button aria-label="Go back" onClick={() => navigate('/settings')} className="mr-4 text-text hover:text-primary transition-colors">
           <ArrowLeft size={24} />
         </button>
         <h1 className="font-heading font-bold text-xl text-text uppercase tracking-wider">About</h1>
