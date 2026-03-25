@@ -45,6 +45,7 @@ export default function FuelCart() {
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         onClick={() => setIsOpen(true)}
+        aria-label="Open fuel cart"
         className="fixed bottom-6 right-6 z-40 w-14 h-14 bg-primary border-2 border-border rounded-sm shadow-brutal flex items-center justify-center text-bg hover:translate-y-[2px] hover:translate-x-[2px] hover:shadow-brutal-sm transition-all"
       >
         <ShoppingCart size={22} />
@@ -75,7 +76,7 @@ export default function FuelCart() {
                 <h3 className="font-heading font-bold text-lg text-text uppercase tracking-wider">
                   Fuel Cart ({cart.length})
                 </h3>
-                <button onClick={() => setIsOpen(false)} className="text-muted hover:text-text transition-colors">
+                <button aria-label="Close cart" onClick={() => setIsOpen(false)} className="text-muted hover:text-text transition-colors">
                   <X size={20} />
                 </button>
               </div>
@@ -101,6 +102,7 @@ export default function FuelCart() {
                       <div className="flex items-center space-x-3">
                         <span className="font-heading font-bold text-text">₹{item.amountRupees.toFixed(0)}</span>
                         <button
+                          aria-label="Remove item"
                           onClick={() => handleRemoveItem(item.id)}
                           className="p-1 text-muted hover:text-red-500 transition-colors"
                         >

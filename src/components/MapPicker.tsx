@@ -167,6 +167,7 @@ export default function MapPicker({ location, onLocationSelect, className = '' }
           <p className="text-sm text-text font-body line-clamp-2 flex-1">{location.address}</p>
           {/* Save Address Button */}
           <button
+            aria-label="Save this address"
             onClick={() => setShowSaveDialog(true)}
             className="shrink-0 w-8 h-8 bg-surface border-2 border-border rounded-sm flex items-center justify-center text-primary hover:bg-bg transition-colors"
             title="Save this address"
