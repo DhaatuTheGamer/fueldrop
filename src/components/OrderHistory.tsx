@@ -85,6 +85,7 @@ export default function OrderHistory() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search orders..."
+            aria-label="Search orders"
             className="input-brutal pl-10"
           />
         </div>
