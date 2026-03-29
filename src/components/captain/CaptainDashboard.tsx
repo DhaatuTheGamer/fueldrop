@@ -197,7 +197,7 @@ export default function CaptainDashboard() {
               <p className="text-muted font-body text-sm mb-6">Go online to start receiving delivery requests.</p>
               <button
                 onClick={() => setStatus('available')}
-                className="btn-primary px-8 py-4 text-base mx-auto"
+                className="btn-primary px-8 py-4 text-base mx-auto focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-2"
                 style={{ backgroundColor: 'var(--accent)', boxShadow: '4px 4px 0px var(--accent)' }}
               >
                 Go Online
@@ -221,7 +221,7 @@ export default function CaptainDashboard() {
               <p className="text-muted font-body text-sm mb-6">Stay online to receive new delivery requests.</p>
               <button
                 onClick={() => setStatus('offline')}
-                className="btn-secondary px-6 py-3"
+                className="btn-secondary px-6 py-3 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-2"
               >
                 Go Offline
               </button>
@@ -285,10 +285,10 @@ export default function CaptainDashboard() {
               </div>
 
               <div className="flex space-x-3">
-                <button onClick={handleDecline} className="btn-secondary flex-1 py-3 flex items-center justify-center">
+                <button onClick={handleDecline} className="btn-secondary flex-1 py-3 flex items-center justify-center focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-2">
                   <XCircle size={18} className="mr-2" /> Decline
                 </button>
-                <button onClick={handleAccept} className="btn-primary flex-1 py-3 flex items-center justify-center"
+                <button onClick={handleAccept} className="btn-primary flex-1 py-3 flex items-center justify-center focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-2"
                   style={{ backgroundColor: 'var(--accent)', boxShadow: '4px 4px 0px var(--accent)' }}
                 >
                   <CheckCircle2 size={18} className="mr-2" /> Accept
@@ -438,7 +438,7 @@ export default function CaptainDashboard() {
                         <p className="text-xs text-muted font-body">{activeOrder.userPhone ? `+91 ${activeOrder.userPhone}` : '+91 XXXX XXXXX'}</p>
                       </div>
                     </div>
-                    <button aria-label="Call Customer" className="w-10 h-10 bg-accent border-2 border-border rounded-sm flex items-center justify-center text-bg shadow-brutal-sm">
+                    <button aria-label="Call Customer" className="w-10 h-10 bg-accent border-2 border-border rounded-sm flex items-center justify-center text-bg shadow-brutal-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-2">
                       <Phone size={18} />
                     </button>
                   </div>
@@ -447,7 +447,7 @@ export default function CaptainDashboard() {
                   {activeOrder.location && (status === 'accepted' || status === 'pickup' || status === 'transit') && (
                     <button
                       onClick={() => window.open(`https://maps.google.com/?daddr=${activeOrder.location.lat},${activeOrder.location.lng}`, '_blank', 'noopener,noreferrer')}
-                      className="card-brutal p-4 flex items-center justify-between transition-colors w-full hover:border-primary group"
+                      className="card-brutal p-4 flex items-center justify-between transition-colors w-full hover:border-primary group focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-2"
                     >
                       <div className="flex items-center space-x-3">
                         <div className="w-10 h-10 bg-accent/20 border-2 border-accent rounded-sm flex items-center justify-center group-hover:bg-accent group-hover:text-bg transition-colors">
@@ -467,31 +467,31 @@ export default function CaptainDashboard() {
               {/* Action Button */}
               <div className="pb-4">
                 {status === 'accepted' && (
-                  <button onClick={handleStartPickup} className="btn-primary w-full py-4 text-base" 
+                  <button onClick={handleStartPickup} className="btn-primary w-full py-4 text-base focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-2"
                     style={{ backgroundColor: 'var(--accent)', boxShadow: '4px 4px 0px var(--accent)' }}>
                     Reached Fuel Station <ChevronRight size={18} className="ml-2" />
                   </button>
                 )}
                 {status === 'pickup' && (
-                  <button onClick={handlePickedUp} className="btn-primary w-full py-4 text-base"
+                  <button onClick={handlePickedUp} className="btn-primary w-full py-4 text-base focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-2"
                     style={{ backgroundColor: 'var(--accent)', boxShadow: '4px 4px 0px var(--accent)' }}>
                     Fuel Picked Up — Start Delivery <ChevronRight size={18} className="ml-2" />
                   </button>
                 )}
                 {status === 'transit' && (
-                  <button onClick={handleArrived} className="btn-primary w-full py-4 text-base"
+                  <button onClick={handleArrived} className="btn-primary w-full py-4 text-base focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-2"
                     style={{ backgroundColor: 'var(--accent)', boxShadow: '4px 4px 0px var(--accent)' }}>
                     I've Arrived <ChevronRight size={18} className="ml-2" />
                   </button>
                 )}
                 {status === 'arrived' && (
-                  <button onClick={handleStartFueling} disabled={!allChecked} className="btn-primary w-full py-4 text-base disabled:opacity-50 disabled:cursor-not-allowed"
+                  <button onClick={handleStartFueling} disabled={!allChecked} className="btn-primary w-full py-4 text-base disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-2"
                     style={{ backgroundColor: 'var(--accent)', boxShadow: allChecked ? '4px 4px 0px var(--accent)' : 'none' }}>
                     {allChecked ? 'Start Fueling' : 'Complete Safety Checklist'} <ChevronRight size={18} className="ml-2" />
                   </button>
                 )}
                 {status === 'fueling' && (
-                  <button onClick={handleComplete} className="btn-primary w-full py-4 text-base"
+                  <button onClick={handleComplete} className="btn-primary w-full py-4 text-base focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-2"
                     style={{ backgroundColor: 'var(--accent)', boxShadow: '4px 4px 0px var(--accent)' }}>
                     Mark as Completed <CheckCircle2 size={18} className="ml-2" />
                   </button>
@@ -503,7 +503,7 @@ export default function CaptainDashboard() {
                     </div>
                     <h3 className="font-heading font-bold text-xl text-text uppercase tracking-wider">Delivery Complete!</h3>
                     <p className="text-muted font-body text-sm">You earned ₹{((activeOrder.totalAmount || 0) * 0.12).toFixed(0)} for this trip.</p>
-                    <button onClick={handleNewOrder} className="btn-primary px-8 py-3"
+                    <button onClick={handleNewOrder} className="btn-primary px-8 py-3 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-2"
                       style={{ backgroundColor: 'var(--accent)', boxShadow: '4px 4px 0px var(--accent)' }}>
                       Accept New Orders
                     </button>
