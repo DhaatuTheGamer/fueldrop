@@ -38,7 +38,7 @@ export default function CheckoutOffersSheet({ isOpen, onClose, onApplyOffer }: C
                 </div>
                 <h3 className="font-heading font-bold text-lg text-text uppercase tracking-wider">Available Offers</h3>
               </div>
-              <button aria-label="Close" onClick={onClose} className="text-muted hover:text-text transition-colors">
+              <button aria-label="Close" onClick={onClose} className="text-muted hover:text-text transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none rounded-sm">
                 <X size={20} />
               </button>
             </div>

@@ -140,7 +140,7 @@ export default function BulkOrder() {
                             {vehicle ? `${vehicle.make} ${vehicle.model}` : 'Unknown'}
                           </span>
                         </div>
-                        <button onClick={() => removeItem(item.id)} className="text-muted hover:text-red-500 transition-colors">
+                        <button aria-label="Remove item" onClick={() => removeItem(item.id)} className="text-muted hover:text-red-500 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none rounded-sm">
                           <Trash2 size={16} />
                         </button>
                       </div>

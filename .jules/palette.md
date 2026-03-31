@@ -20,3 +20,7 @@
 ## 2026-03-30 - Focus Visible Styles for Back Buttons
 **Learning:** Found that the 'Go back' buttons (often represented by a left arrow icon) across various components (Favorites, OrderFuel, About, BulkOrder, Profile, Legal, Checkout, Garage) lacked explicit keyboard focus styling. While some components like Settings and OrderHistory had them (`focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none rounded-sm`), many did not, making keyboard navigation inconsistent and confusing.
 **Action:** Consistently apply explicit `focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none rounded-sm` to all navigation icon buttons like 'Go back' to ensure they remain accessible to keyboard users.
+
+## 2026-04-01 - Focus Visible Styles for Modal and Utility Icon Buttons
+**Learning:** Found that secondary utility icon buttons (like 'X' to close modals, 'Trash' to delete list items, or 'Edit' pens) often lack explicit `focus-visible` styling, just like primary buttons. Because these are often transparent or use subtle hover effects, native browser focus rings can be hard to see or disabled entirely, making it very difficult for keyboard users to navigate complex interactive elements (like carts or lists).
+**Action:** Consistently apply explicit `focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none rounded-sm` (matching the button's border radius) to all utility icon buttons, especially those that trigger destructive actions or close overlays.

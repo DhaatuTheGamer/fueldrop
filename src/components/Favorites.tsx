@@ -111,10 +111,10 @@ export default function Favorites() {
                       )}
                     </div>
                     <div className="flex space-x-1 shrink-0 ml-3">
-                      <button aria-label={`Edit favorite ${fav.name}`} onClick={() => { setEditingId(fav.id); setEditName(fav.name); }} className="p-1.5 text-muted hover:text-primary transition-colors">
+                      <button aria-label={`Edit favorite ${fav.name}`} onClick={() => { setEditingId(fav.id); setEditName(fav.name); }} className="p-1.5 text-muted hover:text-primary transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none rounded-sm">
                         <Edit2 size={16} />
                       </button>
-                      <button aria-label={`Delete favorite ${fav.name}`} onClick={() => setDeleteId(fav.id)} className="p-1.5 text-muted hover:text-red-500 transition-colors">
+                      <button aria-label={`Delete favorite ${fav.name}`} onClick={() => setDeleteId(fav.id)} className="p-1.5 text-muted hover:text-red-500 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none rounded-sm">
                         <Trash2 size={16} />
                       </button>
                     </div>

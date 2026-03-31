@@ -76,7 +76,7 @@ export default function FuelCart() {
                 <h3 className="font-heading font-bold text-lg text-text uppercase tracking-wider">
                   Fuel Cart ({cart.length})
                 </h3>
-                <button aria-label="Close cart" onClick={() => setIsOpen(false)} className="text-muted hover:text-text transition-colors">
+                <button aria-label="Close cart" onClick={() => setIsOpen(false)} className="text-muted hover:text-text transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none rounded-sm">
                   <X size={20} />
                 </button>
               </div>
@@ -104,7 +104,7 @@ export default function FuelCart() {
                         <button
                           aria-label="Remove item"
                           onClick={() => handleRemoveItem(item.id)}
-                          className="p-1 text-muted hover:text-red-500 transition-colors"
+                          className="p-1 text-muted hover:text-red-500 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none rounded-sm"
                         >
                           <Trash2 size={16} />
                         </button>

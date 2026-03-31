@@ -35,7 +35,7 @@ export default function NotificationToast() {
             <button 
               aria-label="Close notification"
               onClick={() => markNotificationRead(notification.id)}
-              className="ml-3 shrink-0 text-muted hover:text-primary transition-colors"
+              className="ml-3 shrink-0 text-muted hover:text-primary transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none rounded-sm"
             >
               <X size={18} />
             </button>

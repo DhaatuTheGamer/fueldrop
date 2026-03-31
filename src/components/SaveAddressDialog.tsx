@@ -50,7 +50,7 @@ export default function SaveAddressDialog({ isOpen, onClose, location }: SaveAdd
           <div className="p-4 bg-surface border-2 border-primary rounded-sm space-y-3">
             <div className="flex items-center justify-between">
               <h4 className="font-heading font-bold text-text text-sm uppercase tracking-wider">Save Address</h4>
-              <button aria-label="Close" onClick={onClose} className="text-muted hover:text-text transition-colors">
+              <button aria-label="Close" onClick={onClose} className="text-muted hover:text-text transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none rounded-sm">
                 <X size={16} />
               </button>
             </div>

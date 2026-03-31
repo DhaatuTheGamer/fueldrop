@@ -143,7 +143,7 @@ export default function Garage() {
             >
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-heading font-bold text-text uppercase tracking-wider">{editingId ? 'Edit Vehicle' : 'Add New Vehicle'}</h2>
-                <button aria-label="Cancel edit" onClick={cancelEdit} className="text-muted hover:text-text transition-colors">
+                <button aria-label="Cancel edit" onClick={cancelEdit} className="text-muted hover:text-text transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none rounded-sm">
                   <X size={24} />
                 </button>
               </div>
@@ -296,14 +296,14 @@ export default function Garage() {
                       <button
                         aria-label={`Edit ${vehicle.make} ${vehicle.model}`}
                         onClick={() => startEdit(vehicle)}
-                        className="p-2 text-muted hover:text-primary transition-colors border-2 border-transparent hover:border-primary rounded-sm hover:bg-surface"
+                        className="p-2 text-muted hover:text-primary transition-colors border-2 border-transparent hover:border-primary rounded-sm hover:bg-surface focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
                       >
                         <Edit2 size={20} />
                       </button>
                       <button
                         aria-label={`Delete ${vehicle.make} ${vehicle.model}`}
                         onClick={() => setVehicleToDelete(vehicle.id)}
-                        className="p-2 text-muted hover:text-red-500 transition-colors border-2 border-transparent hover:border-red-500 rounded-sm hover:bg-surface"
+                        className="p-2 text-muted hover:text-red-500 transition-colors border-2 border-transparent hover:border-red-500 rounded-sm hover:bg-surface focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
                       >
                         <Trash2 size={20} />
                       </button>
