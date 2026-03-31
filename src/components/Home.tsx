@@ -10,7 +10,11 @@ export default function Home() {
   const { user, orders, notifications, vehicles, setCurrentOrder, addNotification } = useAppContext();
   const navigate = useNavigate();
   const unreadCount = useMemo(() => notifications.filter(n => !n.read).length, [notifications]);
-  const recentOrders = useMemo(() => [...orders].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 2), [orders]);
+  const recentOrders = useMemo(() => orders
+    .map(order => ({ order, time: new Date(order.date).getTime() }))
+    .sort((a, b) => b.time - a.time)
+    .slice(0, 2)
+    .map(item => item.order), [orders]);
   const vehiclesWithReminders = useMemo(() => vehicles.filter(v => v.tankCapacity && v.avgDailyKm), [vehicles]);
 
   const [showVehicleModal, setShowVehicleModal] = useState(false);
