@@ -33,8 +33,8 @@ export default function CheckoutConfirmModal({
   // Close on Escape
   useEffect(() => {
     const handleEscape = () => onClose();
-    document.addEventListener('modal-escape' as any, handleEscape);
-    return () => document.removeEventListener('modal-escape' as any, handleEscape);
+    document.addEventListener('modal-escape', handleEscape);
+    return () => document.removeEventListener('modal-escape', handleEscape);
   }, [onClose]);
 
   return (

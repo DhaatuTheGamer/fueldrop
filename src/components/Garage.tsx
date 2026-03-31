@@ -108,8 +108,8 @@ export default function Garage() {
   // Close delete modal on Escape (Feature 8)
   useEffect(() => {
     const handleEscape = () => setVehicleToDelete(null);
-    document.addEventListener('modal-escape' as any, handleEscape);
-    return () => document.removeEventListener('modal-escape' as any, handleEscape);
+    document.addEventListener('modal-escape', handleEscape);
+    return () => document.removeEventListener('modal-escape', handleEscape);
   }, []);
 
   return (

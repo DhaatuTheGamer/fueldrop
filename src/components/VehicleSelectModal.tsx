@@ -21,8 +21,8 @@ export default function VehicleSelectModal({ isOpen, onClose, onSelect, title = 
   useEffect(() => {
     if (!isOpen) return;
     const handleEscape = () => onClose();
-    document.addEventListener('modal-escape' as any, handleEscape);
-    return () => document.removeEventListener('modal-escape' as any, handleEscape);
+    document.addEventListener('modal-escape', handleEscape);
+    return () => document.removeEventListener('modal-escape', handleEscape);
   }, [isOpen, onClose]);
 
   return (

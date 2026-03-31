@@ -86,3 +86,9 @@ export interface SavedAddress {
   emoji: string;
   location: Location;
 }
+
+declare global {
+  interface DocumentEventMap {
+    'modal-escape': CustomEvent;
+  }
+}
