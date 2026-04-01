@@ -24,3 +24,6 @@
 ## 2026-04-01 - Focus Visible Styles for Modal and Utility Icon Buttons
 **Learning:** Found that secondary utility icon buttons (like 'X' to close modals, 'Trash' to delete list items, or 'Edit' pens) often lack explicit `focus-visible` styling, just like primary buttons. Because these are often transparent or use subtle hover effects, native browser focus rings can be hard to see or disabled entirely, making it very difficult for keyboard users to navigate complex interactive elements (like carts or lists).
 **Action:** Consistently apply explicit `focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none rounded-sm` (matching the button's border radius) to all utility icon buttons, especially those that trigger destructive actions or close overlays.
+## 2024-03-20 - Accessible Custom Checkboxes in Brutalist Design
+**Learning:** Custom checkboxes built with `<button>` elements (like in `SafetyChecklist`) need explicit semantic roles (`role="checkbox"`), state attributes (`aria-checked`), and distinct keyboard focus styles (`focus-visible:ring-primary focus-visible:ring-offset-2`) to be accessible, especially against thick brutalist borders.
+**Action:** Always verify that interactive elements disguised as standard controls have full ARIA state management and use the application's standard focus rings to ensure keyboard navigability.

@@ -48,11 +48,13 @@ export default function SafetyChecklist({ onAllChecked }: SafetyChecklistProps) 
             <motion.button
               key={item.id}
               type="button"
+              role="checkbox"
+              aria-checked={isChecked}
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.05 }}
               onClick={() => toggleItem(item.id)}
-              className={`w-full flex items-start space-x-3 p-3 rounded-sm border-2 text-left transition-all ${
+              className={`w-full flex items-start space-x-3 p-3 rounded-sm border-2 text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
                 isChecked
                   ? 'border-accent bg-accent/5'
                   : isTouched
