@@ -102,6 +102,7 @@ export default function Login() {
                   type="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                  aria-label="Mobile Number"
                   className="input-brutal rounded-l-none"
                   placeholder="Enter 10 digit number"
                   required
@@ -137,6 +138,7 @@ export default function Login() {
                 type="text"
                 value={otp}
                 onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                aria-label="Enter OTP"
                 className="input-brutal text-center tracking-widest text-2xl font-heading"
                 placeholder="1234"
                 required

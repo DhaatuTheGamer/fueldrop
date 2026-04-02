@@ -200,6 +200,7 @@ export default function OrderFuel() {
               type="number"
               value={value}
               onChange={(e) => setValue(e.target.value)}
+              aria-label={orderType === 'amount' ? 'Enter amount in rupees' : 'Enter volume in liters'}
               className="w-full pl-12 pr-16 py-4 rounded-sm border-2 border-border bg-bg text-text font-heading font-bold text-xl focus:border-primary focus:ring-0 outline-none transition-colors"
               placeholder={orderType === 'amount' ? 'Enter amount' : 'Enter liters'}
             />

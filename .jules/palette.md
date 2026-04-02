@@ -27,3 +27,7 @@
 ## 2024-03-20 - Accessible Custom Checkboxes in Brutalist Design
 **Learning:** Custom checkboxes built with `<button>` elements (like in `SafetyChecklist`) need explicit semantic roles (`role="checkbox"`), state attributes (`aria-checked`), and distinct keyboard focus styles (`focus-visible:ring-primary focus-visible:ring-offset-2`) to be accessible, especially against thick brutalist borders.
 **Action:** Always verify that interactive elements disguised as standard controls have full ARIA state management and use the application's standard focus rings to ensure keyboard navigability.
+
+## 2024-05-18 - Missing ARIA Labels on Primary Inputs
+**Learning:** Found that primary input fields in forms (like Mobile Number, OTP in `Login.tsx`, and amount/quantity in `OrderFuel.tsx`) lacked programmatic association with their visible labels, which is a critical accessibility issue.
+**Action:** When adding or reviewing input fields, ensure they always have an explicit `aria-label` or are associated with an `<label htmlFor="...">` element, especially when dynamic labels (like "Enter amount in rupees" vs "Enter volume in liters") are needed.
