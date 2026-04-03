@@ -21,9 +21,11 @@ export default function EmergencyToggle({ isEmergency, onToggle }: EmergencyTogg
           </div>
         </div>
         <button
+          role="switch"
+          aria-checked={isEmergency}
           aria-label={isEmergency ? "Turn off emergency mode" : "Turn on emergency mode"}
           onClick={onToggle}
-          className={`relative w-14 h-7 rounded-full border-2 border-border transition-colors ${isEmergency ? 'bg-red-500' : 'bg-bg'}`}
+          className={`relative w-14 h-7 rounded-full border-2 border-border transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-2 ${isEmergency ? 'bg-red-500' : 'bg-bg'}`}
         >
           <motion.div
             animate={{ x: isEmergency ? 26 : 2 }}
