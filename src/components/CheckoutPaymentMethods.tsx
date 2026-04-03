@@ -16,10 +16,10 @@ export default function CheckoutPaymentMethods({ paymentMethod, setPaymentMethod
           { id: 'card', label: 'Credit / Debit Card', icon: <CreditCard size={20} /> },
           { id: 'cash', label: 'Cash on Delivery', icon: <Wallet size={20} /> },
         ].map(method => (
-          <label key={method.id} className={`flex items-center justify-between p-4 rounded-sm border-2 cursor-pointer transition-all ${
+          <label key={method.id} className={`flex items-center justify-between p-4 rounded-sm border-2 cursor-pointer transition-all has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-primary has-[:focus-visible]:outline-none has-[:focus-visible]:ring-offset-2 ${
             paymentMethod === method.id ? 'border-primary bg-surface shadow-brutal-sm' : 'border-border bg-bg hover:border-muted'
           }`}>
-            <input type="radio" name="payment" value={method.id} checked={paymentMethod === method.id} onChange={() => setPaymentMethod(method.id)} className="hidden" />
+            <input type="radio" name="payment" value={method.id} checked={paymentMethod === method.id} onChange={() => setPaymentMethod(method.id)} className="sr-only" />
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-bg border-2 border-border rounded-sm flex items-center justify-center shadow-brutal-sm transition-colors text-text">
                 {method.icon}

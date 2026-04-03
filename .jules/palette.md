@@ -31,3 +31,7 @@
 ## 2024-05-18 - Missing ARIA Labels on Primary Inputs
 **Learning:** Found that primary input fields in forms (like Mobile Number, OTP in `Login.tsx`, and amount/quantity in `OrderFuel.tsx`) lacked programmatic association with their visible labels, which is a critical accessibility issue.
 **Action:** When adding or reviewing input fields, ensure they always have an explicit `aria-label` or are associated with an `<label htmlFor="...">` element, especially when dynamic labels (like "Enter amount in rupees" vs "Enter volume in liters") are needed.
+
+## 2025-04-03 - Custom Radio Buttons Accessibility
+**Learning:** Using `className="hidden"` on native `<input type="radio">` removes them completely from the DOM tab order, breaking keyboard navigation for custom-styled radio options.
+**Action:** Always use `sr-only` instead of `hidden` for native inputs within custom components. To style the parent `<label>` when the native input receives focus, utilize Tailwind's `has-[:focus-visible]:ring-2` (and related `has-[:focus-visible]:*` utilities).

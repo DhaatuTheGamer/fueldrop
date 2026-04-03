@@ -30,6 +30,8 @@ export default function Settings() {
               </div>
             </div>
             <button
+              role="switch"
+              aria-checked={darkMode}
               aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
               onClick={() => setDarkMode(!darkMode)}
               className={`relative w-14 h-8 rounded-sm border-2 border-border transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-offset-2 ${darkMode ? 'bg-primary' : 'bg-surface'}`}
