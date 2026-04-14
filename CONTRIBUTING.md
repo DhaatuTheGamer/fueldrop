@@ -1,4 +1,4 @@
-# Contributing to Simple To-Do List App
+# Contributing to FuelDrop
 
 First off, thanks for taking the time to contribute!
 

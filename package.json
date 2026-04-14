@@ -8,9 +8,9 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/DhaatuTheGamer/fueldrop.git"
+    "url": "https://github.com/dhaatrik/fueldrop.git"
   },
-  "homepage": "https://github.com/DhaatuTheGamer/fueldrop",
+  "homepage": "https://github.com/dhaatrik/fueldrop",
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",
     "build": "vite build",

@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react';
-import { usePersistedState, clearPersistedState } from './usePersistedState';
+import { usePersistedState, clearPersistedState } from '../src/hooks/usePersistedState';
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 
 describe('usePersistedState', () => {

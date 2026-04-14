@@ -4,7 +4,7 @@
 
 # FuelDrop
 
-[![CI](https://github.com/DhaatuTheGamer/fueldrop/actions/workflows/ci.yml/badge.svg)](https://github.com/DhaatuTheGamer/fueldrop/actions)
+[![CI](https://github.com/dhaatrik/fueldrop/actions/workflows/ci.yml/badge.svg)](https://github.com/dhaatrik/fueldrop/actions)
 ![Version](https://img.shields.io/badge/version-3.0.0-E56B25)
 ![License](https://img.shields.io/badge/license-MIT-2B825B)
 
@@ -85,7 +85,7 @@ FuelDrop is a cutting-edge, React-powered fuel delivery platform that redefines 
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/DhaatuTheGamer/fueldrop.git
+   git clone https://github.com/dhaatrik/fueldrop.git
    cd fueldrop
    ```
 
@@ -169,9 +169,10 @@ npm run lint
 
 # Verify the production build
 npm run build
-```
 
-*Note: Unit tests with Vitest are planned for future releases.*
+# Run unit tests
+npm test
+```
 
 ---
 
@@ -182,5 +183,5 @@ This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) f
 ---
 
 <p align="center">
-  Built with ❤️ by the FuelDrop Team
+  Built with ❤️ by Dhaatrik Chowdhury
 </p>
